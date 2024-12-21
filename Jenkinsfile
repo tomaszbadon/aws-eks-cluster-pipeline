@@ -21,7 +21,7 @@ pipeline {
   
   environment {
     AWS_DEFAULT_REGION="eu-central-1"
-    S3_BUCKET_NAME="bucket-with-stacks"
+    STACK_NAME=eks-application-cluster
   }
   
   stages {
@@ -30,7 +30,7 @@ pipeline {
         container('awscli') {
             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
 
-                aws 'aws cloudformation deploy --template-file ./cloud-formation-scripts/main-stack.yml --stack-name eks-application-cluster  --region eu-central-1 --capabilities CAPABILITY_NAMED_IAM'
+                sh "aws 'aws cloudformation deploy --template-file ./cloud-formation-scripts/main-stack.yml --stack-name $STACK_NAME --region $AWS_DEFAULT_REGION --capabilities CAPABILITY_NAMED_IAM"
             
             }
         }
