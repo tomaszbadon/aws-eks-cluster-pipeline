@@ -21,7 +21,7 @@ pipeline {
   
   environment {
     AWS_DEFAULT_REGION="eu-central-1"
-    $S3_BUCKET_NAME="bucket-with-stacks"
+    S3_BUCKET_NAME="bucket-with-stacks"
   }
   
   stages {
