@@ -39,7 +39,9 @@ pipeline {
   
     post {
         always {
-            sh "aws s3api delete-bucket --bucket $S3_BUCKET_NAME --region $AWS_DEFAULT_REGION"
+            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                sh "aws s3api delete-bucket --bucket $S3_BUCKET_NAME --region $AWS_DEFAULT_REGION"
+            }
         }
     }
 }
