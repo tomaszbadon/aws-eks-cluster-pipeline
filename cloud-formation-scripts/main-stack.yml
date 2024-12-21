@@ -17,36 +17,36 @@ Resources:
   #      TimeoutInMinutes: 10
   #      TemplateURL: https://bucket-with-stacks.s3.eu-central-1.amazonaws.com/ec2-template.yml
 
-  # EksClusterRole:
-  #   Type: AWS::IAM::Role
-  #   Properties:
-  #     RoleName: EksClusterRole
-  #     AssumeRolePolicyDocument:
-  #       Version: "2012-10-17"
-  #       Statement:
-  #         - Effect: Allow
-  #           Principal:
-  #             Service:
-  #               - eks.amazonaws.com
-  #           Action:
-  #             - sts:AssumeRole
-  #     ManagedPolicyArns: [ arn:aws:iam::aws:policy/AmazonEKSClusterPolicy ]
+  EksClusterRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: EksClusterRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - eks.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns: [ arn:aws:iam::aws:policy/AmazonEKSClusterPolicy ]
 
-  # EksNodesRole:
-  #   Type: AWS::IAM::Role
-  #   Properties:
-  #     RoleName: EksNodesRole
-  #     AssumeRolePolicyDocument:
-  #       Version: "2012-10-17"
-  #       Statement:
-  #         - Effect: Allow
-  #           Principal:
-  #             Service: ec2.amazonaws.com
-  #           Action: sts:AssumeRole
-  #     ManagedPolicyArns:
-  #       - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
-  #       - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
-  #       - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+  EksNodesRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: EksNodesRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
 
   # EKSCluster:
   #   Type: AWS::EKS::Cluster
