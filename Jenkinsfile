@@ -22,6 +22,7 @@ pipeline {
   environment {
     AWS_DEFAULT_REGION="eu-central-1"
     STACK_NAME="eks-application-cluster"
+    VPC_ID="0"
   }
   
   stages {
@@ -32,6 +33,9 @@ pipeline {
 
                 sh "aws cloudformation deploy --template-file ./cloud-formation-scripts/main-stack.yml --stack-name $STACK_NAME --region $AWS_DEFAULT_REGION --capabilities CAPABILITY_NAMED_IAM"
             
+                VPC_ID = sh(script: 'aws cloudformation describe-stacks --stack-name eks-application-cluster --query 'Stacks[0].Outputs[?OutputKey==`ApplicationEksClusterVpc`].OutputValue' --output text', returnStdout: true)
+
+                sh("echo $VPC_ID")
             }
         }
       }
