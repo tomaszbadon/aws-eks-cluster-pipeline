@@ -21,7 +21,7 @@ pipeline {
   
   environment {
     AWS_DEFAULT_REGION="eu-central-1"
-    STACK_NAME=eks-application-cluster
+    STACK_NAME="eks-application-cluster"
   }
   
   stages {
