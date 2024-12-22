@@ -31,8 +31,9 @@ pipeline {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         script{
-                            def exists = sh(script: "aws s3api head-bucket --bucket $S3_BUCKET_NAME", returnStdout: true).trim();
-                            echo "Ble Ble ${exists}"
+                            // def exists = sh(script: "aws s3api head-bucket --bucket $S3_BUCKET_NAME", returnStdout: true).trim();
+                            def status = sh(script: "aws s3api head-bucket --bucket $S3_BUCKET_NAME", returnStatus: true).trim();
+                            echo "Ble Ble ${status}"
        
                         }
                     }
