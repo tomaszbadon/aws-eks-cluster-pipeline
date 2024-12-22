@@ -10,7 +10,7 @@ pipeline {
         spec:
           containers:
           - name: awscli
-            image: tomaszbadon/awscli
+            image: tomaszbadon/alpine-jenkins-toolkit:221220240937
             command:
             - cat
             tty: true
