@@ -24,8 +24,9 @@ pipeline {
     STACK_NAME="eks-application-cluster"
     VPC_ID="0"
   }
-  container('awscli') {
+  
   stages {
+    container('awscli') {
     stage('Deploy AWS Infrastructure') {
       steps {
         
