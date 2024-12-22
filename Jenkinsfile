@@ -35,12 +35,6 @@ pipeline {
                         def version = sh(script: 'ps aux', returnStdout: true).trim()
                         echo "Version: ${version}"
                 }
-            
-     
-
-                sh "echo $VERSION"
-
-                sh "echo ${env.VERSION}"
 
                 //sh "aws cloudformation deploy --template-file ./cloud-formation-scripts/main-stack.yml --stack-name $STACK_NAME --region $AWS_DEFAULT_REGION --capabilities CAPABILITY_NAMED_IAM"
             
