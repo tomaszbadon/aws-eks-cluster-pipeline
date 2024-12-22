@@ -24,11 +24,11 @@ pipeline {
     STACK_NAME="eks-application-cluster"
     VPC_ID="0"
   }
-  
+  container('awscli') {
   stages {
     stage('Deploy AWS Infrastructure') {
       steps {
-        container('awscli') {
+        
             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
 
                 script {
@@ -40,9 +40,10 @@ pipeline {
             
                 //sh "aws cloudformation describe-stacks --stack-name eks-application-cluster --query 'Stacks[0].Outputs[?OutputKey==`ApplicationEksClusterVpc`].OutputValue' --output text"
             }
-        }
+        
       }
     }
   }
+}
 
 }
