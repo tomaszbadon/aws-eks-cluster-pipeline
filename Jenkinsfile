@@ -31,10 +31,11 @@ pipeline {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         script{
-                            // def exists = sh(script: "aws s3api head-bucket --bucket $S3_BUCKET_NAME", returnStdout: true).trim();
                             def status = sh(script: "aws s3api head-bucket --bucket $S3_BUCKET_NAME", returnStatus: true);
-                            echo "Ble Ble ${status}"
-       
+                            if(status != 0) {
+                                status = sh(script:"aws s3api create-bucket --bucket $S3_BUCKET_NAME --region $AWS_DEFAULT_REGION --create-bucket-configuration LocationConstraint=$AWS_DEFAULT_REGION", returnStatus: true);
+                                echo "The S3 Bucket: ${$S3_BUCKET_NAME} created with status: ${status}";
+                            }
                         }
                     }
 
