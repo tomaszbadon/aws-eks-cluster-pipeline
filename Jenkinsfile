@@ -38,11 +38,19 @@ pipeline {
                             }
                         }
 
-                        echo "Status: $status"
+                        sh "aws s3api put-object --bucket $S3_BUCKET_NAME --key network-template.yml--body cloud-formation-scripts/network-template.yml"
+                        sh "aws s3api put-object --bucket $S3_BUCKET_NAME --key eks-cluster-roles.yml --body cloud-formation-scripts/eks-cluster-roles.yml"
+                        sh "aws s3api put-object --bucket $S3_BUCKET_NAME --key ec2-template.yml --body cloud-formation-scripts/ec2-template.yml"
+
+                        sh "aws cloudformation deploy --template-file ./cloud-formation-scripts/main-stack.yml --stack-name $STACK_NAME --region $AWS_DEFAULT_REGION --capabilities CAPABILITY_NAMED_IAM"
+
+                        script {
+                            def vpcId = sh("aws cloudformation describe-stacks --stack-name eks-application-cluster --query 'Stacks[0].Outputs[?OutputKey==`ApplicationEksClusterVpc`].OutputValue' --output text", returnStdout: true).trim();
+                            echo "VpcId: ${vpcId}"
+                        }
 
                     }
 
-                    //sh "aws s3api create-bucket --bucket $S3_BUCKET_NAME --region $AWS_DEFAULT_REGION --create-bucket-configuration LocationConstraint=$AWS_DEFAULT_REGION" 
 
 
 
@@ -53,7 +61,6 @@ pipeline {
 
                 //sh "aws cloudformation deploy --template-file ./cloud-formation-scripts/main-stack.yml --stack-name $STACK_NAME --region $AWS_DEFAULT_REGION --capabilities CAPABILITY_NAMED_IAM"
             
-                //sh "aws cloudformation describe-stacks --stack-name eks-application-cluster --query 'Stacks[0].Outputs[?OutputKey==`ApplicationEksClusterVpc`].OutputValue' --output text"
                 }
             }
         }
