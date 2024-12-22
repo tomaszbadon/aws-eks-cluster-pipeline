@@ -34,13 +34,16 @@ pipeline {
                 script {
                         def version = sh(script: 'ps aux', returnStdout: true).trim()
                         echo "Version: ${version}"
+
+                        withEnv(["VERSION=${version}"]) {
+                                echo "Version: ${env.VERSION}"
+                
+                            // You can now use env.VERSION in subsequent steps within this block
+                        }
+
                 }
             
-                withEnv(["VERSION=${version}"]) {
-                    echo "Version: ${env.VERSION}"
-                
-                // You can now use env.VERSION in subsequent steps within this block
-                }
+     
 
                 sh "echo $VERSION"
 
