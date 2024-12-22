@@ -23,6 +23,7 @@ pipeline {
     AWS_DEFAULT_REGION="eu-central-1"
     STACK_NAME="eks-application-cluster"
     S3_BUCKET_NAME="bucket-with-stacks"
+    EKS_CLUSTER_NAME="ApplicationEksCluster"
   }
   
   stages {
@@ -43,6 +44,14 @@ pipeline {
                         sh "aws s3api put-object --bucket $S3_BUCKET_NAME --key ec2-template.yml --body cloud-formation-scripts/ec2-template.yml"
 
                         sh "aws cloudformation deploy --template-file ./cloud-formation-scripts/main-stack.yml --stack-name $STACK_NAME --region $AWS_DEFAULT_REGION --capabilities CAPABILITY_NAMED_IAM"
+
+                        sh "aws eks update-kubeconfig --region eu-central-1 --name $EKS_CLUSTER_NAME"
+
+                        sh "kubectl get all"
+
+                        sh "helm repo add eks https://aws.github.io/eks-charts"
+
+                        sh "helm repo update eks"
 
                         script {
                             def vpcId = sh(script: "aws cloudformation describe-stacks --stack-name eks-application-cluster --query 'Stacks[0].Outputs[?OutputKey==`ApplicationEksClusterVpc`].OutputValue' --output text", returnStdout: true).trim();
