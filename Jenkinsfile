@@ -24,6 +24,7 @@ pipeline {
     STACK_NAME="eks-application-cluster"
     S3_BUCKET_NAME="bucket-with-stacks"
     EKS_CLUSTER_NAME="ApplicationEksCluster"
+    AWS_CONTROLLER_RELEASE_NAME="aws-load-balancer-controller"
   }
   
   stages {
@@ -66,13 +67,14 @@ pipeline {
 
                             sh(script:"kubectl apply -f ./k8s/load-balancer-service-account.yml")
 
-                            def statusCode = sh(script: "helm status -n kube-system aws-load-balancer-controller", returnStatus: true)
-                            echo "Status Code ${statusCode}"
+                            def statusCode = sh(script: "helm status -n kube-system $AWS_CONTROLLER_RELEASE_NAME", returnStatus: true)
+                            if (statusCode != 0) {
+                                sh(script: "helm install $AWS_CONTROLLER_RELEASE_NAME eks/aws-load-balancer-controller -n kube-system --set clusterName=$EKS_CLUSTER_NAME --set serviceAccount.create=false --set serviceAccount.name=load-balancer-service-account --set region=$AWS_DEFAULT_REGION --set vpcId=${vpcId}")
+                                echo "Ingress Controller: eks/aws-load-balancer-controller was installed"
+                            } else {
+                                echo "Ingress Controller: eks/aws-load-balancer-controller installation was skipped"
+                            }
 
-                            statusCode = sh(script: "helm status -n kube-system aws-load-balancer-controllerbleble", returnStatus: true)
-                            echo "Status Code ${statusCode}"
-
-                            //sh(script: "helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=$EKS_CLUSTER_NAME --set serviceAccount.create=false --set serviceAccount.name=load-balancer-service-account --set region=$AWS_DEFAULT_REGION --set vpcId=${vpcId}")
                         }
 
                     }
