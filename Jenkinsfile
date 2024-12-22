@@ -27,8 +27,8 @@ pipeline {
   
   stages {
     stage('Deploy AWS Infrastructure') {
-        container('awscli') {
             steps {
+                container('awscli') {
             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                 script {
                         def version = sh(script: 'ps aux', returnStdout: true).trim()
