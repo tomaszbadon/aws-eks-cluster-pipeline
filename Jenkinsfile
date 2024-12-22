@@ -32,10 +32,8 @@ pipeline {
             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
 
                 script {
-                            def version = sh(script: 'ps aux', returnStdout: true).trim()
-                            echo "Version: ${version}"
-                        }
-
+                        def version = sh(script: 'ps aux', returnStdout: true).trim()
+                        echo "Version: ${version}"
                 }
             
      
