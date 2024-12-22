@@ -45,7 +45,7 @@ pipeline {
                         sh "aws cloudformation deploy --template-file ./cloud-formation-scripts/main-stack.yml --stack-name $STACK_NAME --region $AWS_DEFAULT_REGION --capabilities CAPABILITY_NAMED_IAM"
 
                         script {
-                            def vpcId = sh("aws cloudformation describe-stacks --stack-name eks-application-cluster --query 'Stacks[0].Outputs[?OutputKey==`ApplicationEksClusterVpc`].OutputValue' --output text", returnStdout: true).trim();
+                            def vpcId = sh(script: "aws cloudformation describe-stacks --stack-name eks-application-cluster --query 'Stacks[0].Outputs[?OutputKey==`ApplicationEksClusterVpc`].OutputValue' --output text", returnStdout: true).trim();
                             echo "VpcId: ${vpcId}"
                         }
 
