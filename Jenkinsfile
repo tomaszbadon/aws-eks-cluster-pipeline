@@ -22,6 +22,7 @@ pipeline {
   environment {
     AWS_DEFAULT_REGION="eu-central-1"
     STACK_NAME="eks-application-cluster"
+    S3_BUCKET_NAME="bucket-with-stacks"
   }
   
   stages {
@@ -29,7 +30,10 @@ pipeline {
             steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-
+                        script {
+                            def exists = sh(script: "aws s3api head-bucket --bucket $S3_BUCKET_NAME | grep 404", returnStdout: true).trim();
+                            echo exists.notBlank;
+                        }
                     }
 
                     //sh "aws s3api create-bucket --bucket $S3_BUCKET_NAME --region $AWS_DEFAULT_REGION --create-bucket-configuration LocationConstraint=$AWS_DEFAULT_REGION" 
