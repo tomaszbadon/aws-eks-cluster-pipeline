@@ -54,7 +54,7 @@ pipeline {
                         // sh "helm repo update eks"
 
                         script {
-                            def fileContent = new File('./k8s/load-balancer-service-account.yml').text
+                            def fileContent = readFile('./k8s/load-balancer-service-account.yml')
                             fileContent = fileContent.replace("{{ROLE_ARN}}", "arn:aws:iam::141643165132:role/AmazonEKSLoadBalancerControllerRole")
                             echo fileContent
                         }
