@@ -26,12 +26,10 @@ pipeline {
   }
   
   stages {
-    container('awscli') {
     stage('Deploy AWS Infrastructure') {
-      steps {
-        
+        container('awscli') {
+            steps {
             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-
                 script {
                         def version = sh(script: 'ps aux', returnStdout: true).trim()
                         echo "Version: ${version}"
@@ -41,7 +39,6 @@ pipeline {
             
                 //sh "aws cloudformation describe-stacks --stack-name eks-application-cluster --query 'Stacks[0].Outputs[?OutputKey==`ApplicationEksClusterVpc`].OutputValue' --output text"
             }
-        
       }
     }
   }
