@@ -32,13 +32,8 @@ pipeline {
             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
 
                 script {
-                        def version = sh(script: 'ps aux', returnStdout: true).trim()
-                        echo "Version: ${version}"
-
-                        withEnv(["VERSION=${version}"]) {
-                                echo "Version: ${env.VERSION}"
-                
-                            // You can now use env.VERSION in subsequent steps within this block
+                            def version = sh(script: 'ps aux', returnStdout: true).trim()
+                            echo "Version: ${version}"
                         }
 
                 }
