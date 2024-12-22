@@ -66,12 +66,12 @@ pipeline {
 
                             sh(script:"kubectl apply -f ./k8s/load-balancer-service-account.yml")
 
-                            def statusCode = sh("helm status -n kube-system aws-load-balancer-controller", returnStatus: true)
+                            def statusCode = sh(script: "helm status -n kube-system aws-load-balancer-controller", returnStatus: true)
                             echo "Status Code ${statusCode}"
 
-                            statusCode = sh("helm status -n kube-system aws-load-balancer-controllerbleble", returnStatus: true)
+                            statusCode = sh(script: "helm status -n kube-system aws-load-balancer-controllerbleble", returnStatus: true)
                             echo "Status Code ${statusCode}"
-                            
+
                             //sh(script: "helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=$EKS_CLUSTER_NAME --set serviceAccount.create=false --set serviceAccount.name=load-balancer-service-account --set region=$AWS_DEFAULT_REGION --set vpcId=${vpcId}")
                         }
 
