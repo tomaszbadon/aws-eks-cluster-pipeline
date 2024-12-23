@@ -21,4 +21,6 @@ def deployApp() {
     echo 'deplying the application...'
 }
 
+def aws_credentials = [aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')];
+
 return this
