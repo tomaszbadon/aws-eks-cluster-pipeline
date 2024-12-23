@@ -45,7 +45,10 @@ pipeline {
                 container('awscli') {
                      withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         script {
-                            gv.s3BucketExist();
+                            gv.s3BucketExist()
+                            echo "${env.S3_BUCKET_EXISTS}"
+                            echo "${env.S3_BUCKET_EXISTS === 'false'}"
+                            echo "${env.S3_BUCKET_EXISTS === 'true'}"
                         }
                      }
                 }
