@@ -47,9 +47,9 @@ pipeline {
                         script {
                             gv.s3BucketExist()
                             echo "${env.S3_BUCKET_EXISTS}"
-                            def result = env.S3_BUCKET_EXISTS == 'false'
+                            result = env.S3_BUCKET_EXISTS == 'false'
                             echo "Result: ${result}";
-                            def result = env.S3_BUCKET_EXISTS === 'false'
+                            result = env.S3_BUCKET_EXISTS === 'false'
                             echo "Result: ${result}";
                         }
                      }
