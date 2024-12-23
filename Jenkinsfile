@@ -31,7 +31,6 @@ pipeline {
 
     stages {
 
-
         stage('Init') {
             steps {
                 script {
@@ -43,11 +42,11 @@ pipeline {
         stage('S3 Bucket Check') {
             steps {
                 container('awscli') {
-                     withCredentials(gv.aws_credentials) {
+                    withCredentials(gv.aws_credentials) {
                         script {
                             gv.s3BucketExist()
                         }
-                     }
+                    }
                 }
             }
         }
@@ -60,11 +59,11 @@ pipeline {
             }
             steps {
                 container('awscli') {
-                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         echo env.S3_BUCKET_EXISTS
                         echo "${S3_BUCKET_EXISTS}"
-                        echo "S3 Bucket Created"
-                     }
+                        echo 'S3 Bucket Created'
+                    }
                 }
             }
         }
@@ -73,7 +72,6 @@ pipeline {
             steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-
 
                         //sh "aws s3api put-object --bucket $S3_BUCKET_NAME --key network-template.yml --body cloud-formation-scripts/network-template.yml"
                         //sh "aws s3api put-object --bucket $S3_BUCKET_NAME --key eks-cluster-roles.yml --body cloud-formation-scripts/eks-cluster-roles.yml"
