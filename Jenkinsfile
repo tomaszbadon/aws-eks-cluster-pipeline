@@ -60,7 +60,9 @@ pipeline {
             steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        gv.createS3Bucket()
+                        script {
+                            gv.createS3Bucket()
+                        }
                     }
                 }
             }
