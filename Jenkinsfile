@@ -81,6 +81,22 @@ pipeline {
             }
         }
 
+        stage('Deploy Cloud Formation Stack') {
+            steps {
+                container('awscli') {
+                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        script {
+                            sh """aws cloudformation deploy \
+                            --template-file ./cloud-formation-scripts/main-stack.yml \
+                            --stack-name $STACK_NAME \
+                            --region $AWS_DEFAULT_REGION \
+                            --capabilities CAPABILITY_NAMED_IAM"""
+                        }
+                    }
+                }
+            }
+        }
+        
         stage('Deploy AWS Infrastructure') {
             steps {
                 container('awscli') {
