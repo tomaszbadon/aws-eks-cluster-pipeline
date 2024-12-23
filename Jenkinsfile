@@ -63,7 +63,7 @@ pipeline {
 
                         // sh 'helm repo update eks'
 
-                        script {
+                        //script {
                             // def vpcId = sh(script: "aws cloudformation describe-stacks --stack-name eks-application-cluster --query 'Stacks[0].Outputs[?OutputKey==`ApplicationEksClusterVpc`].OutputValue' --output text", returnStdout: true).trim()
                             // echo "VpcId: ${vpcId}"
                             // def loadBalancerControllerRole = sh(script: "aws cloudformation describe-stacks --stack-name eks-application-cluster --query 'Stacks[0].Outputs[?OutputKey==`LoadBalancerControllerRole`].OutputValue' --output text", returnStdout: true).trim()
@@ -83,7 +83,7 @@ pipeline {
                             // } else {
                             //     echo 'Ingress Controller: eks/aws-load-balancer-controller installation was skipped'
                             // }
-                        }
+                        //}
                     }
 
                 // script {
