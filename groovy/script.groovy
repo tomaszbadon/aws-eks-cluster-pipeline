@@ -16,7 +16,7 @@ def createS3Bucket() {
 def uploadFileToS3Bucket(file) {
     sh(script: """aws s3api put-object \
         --bucket $S3_BUCKET_NAME \
-        --key network-template.yml \
+        --key ${file} \
         --body cloud-formation-scripts/${file}""")
 }
 
