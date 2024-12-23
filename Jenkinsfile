@@ -123,9 +123,9 @@ pipeline {
             steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        // script {
-                        //     gv.deployAwsLoadBalancerServiceAccount()
-                        // }
+                        script {
+                            gv.deployAwsLoadBalancerServiceAccount()
+                        }
                     }
                 }
             }
@@ -135,9 +135,9 @@ pipeline {
             steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        // script {
-                        //     gv.awsLoadBalancerControllerExists()
-                        // }
+                        script {
+                            gv.awsLoadBalancerControllerExists()
+                        }
                     }
                 }
             }
@@ -152,9 +152,9 @@ pipeline {
             steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        // script {
-                        //     gv.installAwsLoadBalancerController()
-                        // }
+                        script {
+                            gv.installAwsLoadBalancerController()
+                        }
                     }
                 }
             }
