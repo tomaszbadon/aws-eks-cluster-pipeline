@@ -30,24 +30,43 @@ pipeline {
     }
 
     stages {
-        stage("Init") {
+
+
+        stage('Init') {
             steps {
                 script {
                     gv = load './groovy/script.groovy'
                 }
             }
         }
+
+        stage('S3 Bucket Check') {
+            steps {
+                container('awscli') {
+                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        gv.s3BucketExist();
+                     }
+                }
+            }
+        }
+
+        stage('Create S3 Bucket') {
+            steps {
+                container('awscli') {
+                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        echo env.S3_BUCKET_EXISTS
+                        echo $S3_BUCKET_EXISTS
+                        echo ${S3_BUCKET_EXISTS}
+                     }
+                }
+            }
+        }
+
         stage('Deploy AWS Infrastructure') {
             steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        script {
-                            def status = sh(script: "aws s3api head-bucket --bucket $S3_BUCKET_NAME", returnStatus: true)
-                            if (status != 0) {
-                                status = sh(script:"aws s3api create-bucket --bucket $S3_BUCKET_NAME --region $AWS_DEFAULT_REGION --create-bucket-configuration LocationConstraint=$AWS_DEFAULT_REGION", returnStatus: true)
-                                echo "The S3 Bucket: ${S3_BUCKET_NAME} created with status: ${status}"
-                            }
-                        }
+
 
                         //sh "aws s3api put-object --bucket $S3_BUCKET_NAME --key network-template.yml --body cloud-formation-scripts/network-template.yml"
                         //sh "aws s3api put-object --bucket $S3_BUCKET_NAME --key eks-cluster-roles.yml --body cloud-formation-scripts/eks-cluster-roles.yml"
@@ -76,14 +95,14 @@ pipeline {
 
                             // sh(script:'kubectl apply -f ./k8s/load-balancer-service-account.yml')
 
-                            // def statusCode = sh(script: "helm status -n kube-system $AWS_CONTROLLER_RELEASE_NAME", returnStatus: true)
-                            // if (statusCode != 0) {
-                            //     sh(script: "helm install $AWS_CONTROLLER_RELEASE_NAME eks/aws-load-balancer-controller -n kube-system --set clusterName=$EKS_CLUSTER_NAME --set serviceAccount.create=false --set serviceAccount.name=load-balancer-service-account --set region=$AWS_DEFAULT_REGION --set vpcId=${vpcId}")
-                            //     echo 'Ingress Controller: eks/aws-load-balancer-controller was installed'
-                            // } else {
-                            //     echo 'Ingress Controller: eks/aws-load-balancer-controller installation was skipped'
-                            // }
-                        //}
+                    // def statusCode = sh(script: "helm status -n kube-system $AWS_CONTROLLER_RELEASE_NAME", returnStatus: true)
+                    // if (statusCode != 0) {
+                    //     sh(script: "helm install $AWS_CONTROLLER_RELEASE_NAME eks/aws-load-balancer-controller -n kube-system --set clusterName=$EKS_CLUSTER_NAME --set serviceAccount.create=false --set serviceAccount.name=load-balancer-service-account --set region=$AWS_DEFAULT_REGION --set vpcId=${vpcId}")
+                    //     echo 'Ingress Controller: eks/aws-load-balancer-controller was installed'
+                    // } else {
+                    //     echo 'Ingress Controller: eks/aws-load-balancer-controller installation was skipped'
+                    // }
+                    //}
                     }
 
                 // script {
