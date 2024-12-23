@@ -36,7 +36,7 @@ def fetchVpcIdAndLoadBalancerControllerRole() {
         --stack-name eks-application-cluster \
         --query 'Stacks[0].Outputs[?OutputKey==`LoadBalancerControllerRole`].OutputValue' \
         --output text""", returnStdout: true).trim()
-    echo "vpcId: ${loadBalancerControllerRole}"
+    echo "LoadBalancerControllerRole: ${loadBalancerControllerRole}"
 
     env.VPC_ID = vpcId
     env.LOAD_BALANCER_ROLE = loadBalancerControllerRole

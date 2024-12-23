@@ -90,7 +90,7 @@ Resources:
     DependsOn: EKSCluster
     Properties:
       ClientIdList:
-        - "*"
+        - "sts.amazonaws.com"
       Url: !GetAtt EKSCluster.OpenIdConnectIssuerUrl
 
   EksClusterRoles:
