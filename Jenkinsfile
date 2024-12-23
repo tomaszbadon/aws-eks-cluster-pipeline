@@ -30,7 +30,6 @@ pipeline {
     }
 
     stages {
-
         stage('Init') {
             steps {
                 script {
@@ -69,12 +68,14 @@ pipeline {
         }
 
         stage('Upload Cloud Formation templates to S3 Bucket') {
-            steps{
+            steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        gv.uploadFileToS3Bucket('network-template.yml')
-                        gv.uploadFileToS3Bucket('eks-cluster-roles.yml')
-                        gv.uploadFileToS3Bucket('ec2-template.yml')
+                        script {
+                            gv.uploadFileToS3Bucket('network-template.yml')
+                            gv.uploadFileToS3Bucket('eks-cluster-roles.yml')
+                            gv.uploadFileToS3Bucket('ec2-template.yml')
+                        }
                     }
                 }
             }
@@ -84,7 +85,6 @@ pipeline {
             steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-
                         //sh "aws s3api put-object --bucket $S3_BUCKET_NAME --key network-template.yml --body cloud-formation-scripts/network-template.yml"
                         //sh "aws s3api put-object --bucket $S3_BUCKET_NAME --key eks-cluster-roles.yml --body cloud-formation-scripts/eks-cluster-roles.yml"
                         //sh "aws s3api put-object --bucket $S3_BUCKET_NAME --key ec2-template.yml --body cloud-formation-scripts/ec2-template.yml"
