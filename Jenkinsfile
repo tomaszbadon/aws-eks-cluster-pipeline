@@ -60,7 +60,7 @@ pipeline {
         stage('Create S3 Bucket') {
             when {
                 expression {
-                    env.S3_BUCKET_EXISTS === 'false'
+                    S3_BUCKET_EXISTS == 'false'
                 }
             }
             steps {
