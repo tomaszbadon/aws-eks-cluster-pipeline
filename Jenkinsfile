@@ -53,11 +53,17 @@ pipeline {
         }
 
         stage('Create S3 Bucket') {
+            when {
+                expression {
+                    env.S3_BUCKET_EXISTS == false
+                }
+            }
             steps {
                 container('awscli') {
                      withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         echo env.S3_BUCKET_EXISTS
                         echo "${S3_BUCKET_EXISTS}"
+                        echo "S3 Bucket Created"
                      }
                 }
             }
