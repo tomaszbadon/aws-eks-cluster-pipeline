@@ -38,7 +38,7 @@ pipeline {
             }
         }
 
-        stage('S3 Bucket Check') {
+        stage('Check if S3 Bucket exists') {
             steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
@@ -96,11 +96,74 @@ pipeline {
                 }
             }
         }
-        
-        stage('Deploy AWS Infrastructure') {
+
+        stage('Update kubectl') {
             steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        sh "aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name $EKS_CLUSTER_NAME"
+                    }
+                }
+            }
+        }
+
+        stage('Fetch VpcId and AwsLoadBalancerControllerRole') {
+            steps {
+                container('awscli') {
+                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        script {
+                            gv.fetchVpcIdAndLoadBalancerControllerRole()
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Deploy AWS Load Balancer Service Account') {
+            steps {
+                container('awscli') {
+                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        script {
+                            gv.deployAwsLoadBalancerServiceAccount()
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Check Ingress Controller') {
+            steps {
+                container('awscli') {
+                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        script {
+                            gv.awsLoadBalancerControllerExists()
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Install Ingress Controller') {
+            when {
+                expression {
+                    env.AWS_LOAD_BALANCER_CONTROLLER_EXISTS == 'false'
+                }
+            }
+            steps {
+                container('awscli') {
+                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        script {
+                            gv.installAwsLoadBalancerController()
+                        }
+                    }
+                }
+            }
+        }
+
+        // stage('Deploy AWS Infrastructure') {
+        //     steps {
+        //         container('awscli') {
+        //             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         //sh "aws s3api put-object --bucket $S3_BUCKET_NAME --key network-template.yml --body cloud-formation-scripts/network-template.yml"
                         //sh "aws s3api put-object --bucket $S3_BUCKET_NAME --key eks-cluster-roles.yml --body cloud-formation-scripts/eks-cluster-roles.yml"
                         //sh "aws s3api put-object --bucket $S3_BUCKET_NAME --key ec2-template.yml --body cloud-formation-scripts/ec2-template.yml"
@@ -136,16 +199,16 @@ pipeline {
                     //     echo 'Ingress Controller: eks/aws-load-balancer-controller installation was skipped'
                     // }
                     //}
-                    }
+                    // }
 
                 // script {
                 //         def version = sh(script: 'ps aux', returnStdout: true).trim()
                 //         echo "Version: ${version}"
                 // }
 
-                //sh "aws cloudformation deploy --template-file ./cloud-formation-scripts/main-stack.yml --stack-name $STACK_NAME --region $AWS_DEFAULT_REGION --capabilities CAPABILITY_NAMED_IAM"
-                }
-            }
-        }
+    //sh "aws cloudformation deploy --template-file ./cloud-formation-scripts/main-stack.yml --stack-name $STACK_NAME --region $AWS_DEFAULT_REGION --capabilities CAPABILITY_NAMED_IAM"
+    // }
+    // }
+    // }
     }
 }

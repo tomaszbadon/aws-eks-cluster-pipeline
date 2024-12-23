@@ -18,11 +18,50 @@ def uploadFileToS3Bucket(file) {
         --bucket $S3_BUCKET_NAME \
         --key network-template.yml \
         --body cloud-formation-scripts/${file}""")
-
 }
 
-def deployApp() {
-    echo 'deplying the application...'
+def awsLoadBalancerControllerExists() {
+    def status = sh(script: 'helm status -n kube-system aws-load-balancer-controller', returnStatus: true)
+    env.AWS_LOAD_BALANCER_CONTROLLER_EXISTS = status == 0 ? 'true' : 'false'
+}
+
+def fetchVpcIdAndLoadBalancerControllerRole() {
+    def vpcId = sh(script: """aws cloudformation describe-stacks \
+        --stack-name eks-application-cluster \
+        --query 'Stacks[0].Outputs[?OutputKey==`ApplicationEksClusterVpc`].OutputValue' \
+        --output text""", returnStdout: true).trim()
+    echo "vpcId: ${vpcId}"
+
+    def loadBalancerControllerRole = sh(script: """aws cloudformation describe-stacks \
+        --stack-name eks-application-cluster \
+        --query 'Stacks[0].Outputs[?OutputKey==`LoadBalancerControllerRole`].OutputValue' \
+        --output text""", returnStdout: true).trim()
+    echo "vpcId: ${loadBalancerControllerRole}"
+
+    env.VPC_ID = vpcId
+    env.LOAD_BALANCER_ROLE = loadBalancerControllerRole
+}
+
+def deployAwsLoadBalancerServiceAccount() {
+    def fileContent = readFile('./k8s/load-balancer-service-account.yml')
+    fileContent = fileContent.replace('{{ROLE_ARN}}', env.LOAD_BALANCER_ROLE)
+    writeFile file: './k8s/load-balancer-service-account.yml', text: "${fileContent}"
+    echo fileContent
+
+    sh(script:'kubectl apply -f ./k8s/load-balancer-service-account.yml')
+}
+
+def installAwsLoadBalancerController() {
+    sh(script: 'helm repo add eks https://aws.github.io/eks-charts')
+
+    sh(script: 'helm repo update eks')
+
+    sh(script: """helm install $AWS_CONTROLLER_RELEASE_NAME eks/aws-load-balancer-controller \
+        -n kube-system --set clusterName=$EKS_CLUSTER_NAME \
+        --set serviceAccount.create=false \
+        --set serviceAccount.name=load-balancer-service-account \
+        --set region=$AWS_DEFAULT_REGION \
+        --set vpcId=${env.VPC_ID}""")
 }
 
 return this
