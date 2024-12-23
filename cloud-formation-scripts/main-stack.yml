@@ -89,8 +89,7 @@ Resources:
     Type: "AWS::IAM::OIDCProvider"
     DependsOn: EKSCluster
     Properties:
-      ClientIdList:
-        - "sts.amazonaws.com"
+      ClientIdList: [sts.amazonaws.com]
       Url: !GetAtt EKSCluster.OpenIdConnectIssuerUrl
 
   EksClusterRoles:
