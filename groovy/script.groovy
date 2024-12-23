@@ -9,12 +9,16 @@ def createS3Bucket() {
             --region $AWS_DEFAULT_REGION \
             --create-bucket-configuration \
             LocationConstraint=$AWS_DEFAULT_REGION"""
-    def status = sh(script: command, returnStatus: true)
+    def status = sh(script: command, returnStatus: true) == 0 ? 'true' : 'false'
     echo "The S3 Bucket: ${S3_BUCKET_NAME} created with status: ${status}"
 }
 
-def testApp() {
-    echo 'testing the application...'
+def uploadFileToS3Bucket(file) {
+    sh(script: """aws s3api put-object \
+        --bucket $S3_BUCKET_NAME \
+        --key network-template.yml \
+        --body cloud-formation-scripts/${file}""")
+
 }
 
 def deployApp() {

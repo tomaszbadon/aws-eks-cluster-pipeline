@@ -68,6 +68,18 @@ pipeline {
             }
         }
 
+        stage('Upload Cloud Formation templates to S3 Bucket') {
+            steps{
+                container('awscli') {
+                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        gv.uploadFileToS3Bucket('network-template.yml')
+                        gv.uploadFileToS3Bucket('eks-cluster-roles.yml')
+                        gv.uploadFileToS3Bucket('ec2-template.yml')
+                    }
+                }
+            }
+        }
+
         stage('Deploy AWS Infrastructure') {
             steps {
                 container('awscli') {
