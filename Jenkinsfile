@@ -49,8 +49,6 @@ pipeline {
                             echo "${env.S3_BUCKET_EXISTS}"
                             result = env.S3_BUCKET_EXISTS == 'false'
                             echo "Result: ${result}";
-                            result = env.S3_BUCKET_EXISTS === 'false'
-                            echo "Result: ${result}";
                         }
                      }
                 }
