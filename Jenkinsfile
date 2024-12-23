@@ -42,7 +42,7 @@ pipeline {
         stage('S3 Bucket Check') {
             steps {
                 container('awscli') {
-                    withCredentials(gv.aws_credentials) {
+                    withCredentials(env.AWS_CREDENTIALS) {
                         script {
                             gv.s3BucketExist()
                         }
