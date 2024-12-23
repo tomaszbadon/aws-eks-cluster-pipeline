@@ -1,0 +1,3 @@
+defbucketExists() {
+    echo 'Hello World'
+}
