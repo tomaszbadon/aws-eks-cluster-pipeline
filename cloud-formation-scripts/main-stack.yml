@@ -94,14 +94,14 @@ Resources:
         - "sts.amazonaws.com"
       Url: !GetAtt EKSCluster.OpenIdConnectIssuerUrl
 
-  EksClusterRoles:
-    Type: "AWS::CloudFormation::Stack"
-    DependsOn: EKSCluster
-    Properties:
-      Parameters:
-        EKSClusterEndpoint: !GetAtt EKSCluster.Endpoint
-      TimeoutInMinutes: 10
-      TemplateURL: https://bucket-with-stacks.s3.eu-central-1.amazonaws.com/eks-cluster-roles.yml
+  # EksClusterRoles:
+  #   Type: "AWS::CloudFormation::Stack"
+  #   DependsOn: EKSCluster
+  #   Properties:
+  #     Parameters:
+  #       EKSClusterEndpoint: !GetAtt EKSCluster.Endpoint
+  #     TimeoutInMinutes: 10
+  #     TemplateURL: https://bucket-with-stacks.s3.eu-central-1.amazonaws.com/eks-cluster-roles.yml
 
 Outputs:
   ApplicationEksClusterVpc:
@@ -109,8 +109,8 @@ Outputs:
     Value: !GetAtt NetworkStack.Outputs.ClusterVPC
     Export:
       Name: ApplicationEksClusterVpc
-  LoadBalancerControllerRole:
-    Description: AwsLoadBalancerControllerRole
-    Value: !GetAtt EksClusterRoles.Outputs.AwsLoadBalancerControllerRole
-    Export:
-      Name: LoadBalancerControllerRole
+  # LoadBalancerControllerRole:
+  #   Description: AwsLoadBalancerControllerRole
+  #   Value: !GetAtt EksClusterRoles.Outputs.AwsLoadBalancerControllerRole
+  #   Export:
+  #     Name: LoadBalancerControllerRole
