@@ -124,7 +124,7 @@ pipeline {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         script {
-                            gv.deployAwsLoadBalancerServiceAccount()
+                            //gv.deployAwsLoadBalancerServiceAccount()
                         }
                     }
                 }
@@ -136,7 +136,7 @@ pipeline {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         script {
-                            gv.awsLoadBalancerControllerExists()
+                            //gv.awsLoadBalancerControllerExists()
                         }
                     }
                 }
@@ -146,14 +146,14 @@ pipeline {
         stage('Install Ingress Controller') {
             when {
                 expression {
-                    env.AWS_LOAD_BALANCER_CONTROLLER_EXISTS == 'false'
+                    //env.AWS_LOAD_BALANCER_CONTROLLER_EXISTS == 'false'
                 }
             }
             steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         script {
-                            gv.installAwsLoadBalancerController()
+                            //gv.installAwsLoadBalancerController()
                         }
                     }
                 }
