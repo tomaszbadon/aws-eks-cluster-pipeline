@@ -59,7 +59,7 @@ def installAwsLoadBalancerController() {
     sh(script: """helm install $AWS_CONTROLLER_RELEASE_NAME eks/aws-load-balancer-controller \
         -n kube-system --set clusterName=$EKS_CLUSTER_NAME \
         --set serviceAccount.create=false \
-        --set serviceAccount.name=load-balancer-service-account \
+        --set serviceAccount.name=aws-load-balancer-controller \
         --set region=$AWS_DEFAULT_REGION \
         --set vpcId=${env.VPC_ID}""")
 }
