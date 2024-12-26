@@ -90,7 +90,9 @@ pipeline {
                             --template-file ./cloud-formation-scripts/main-stack.yml \
                             --stack-name $STACK_NAME \
                             --region $AWS_DEFAULT_REGION \
-                            --capabilities CAPABILITY_NAMED_IAM"""
+                            --capabilities CAPABILITY_NAMED_IAM \
+                            --parameter-overrides ClusterName=$EKS_CLUSTER_NAME
+                            """
                         }
                     }
                 }
