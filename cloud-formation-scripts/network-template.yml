@@ -7,7 +7,7 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: !Join['-', ['AWS EKS Cluster VPC', !Ref "AWS::Region"]]
+          Value: !Join ["-", ["AWS EKS Cluster VPC", !Ref "AWS::Region"]]
 
   PublicSubnetA:
     Type: AWS::EC2::Subnet
@@ -241,7 +241,7 @@ Outputs:
       Name: PublicSubnetA
   PublicSubnetB:
     Description: PublicSubnetB
-    Value: !Ref  PublicSubnetB
+    Value: !Ref PublicSubnetB
     Export:
       Name: PublicSubnetB
   PublicSubnetC:
