@@ -1,3 +1,8 @@
+Parameters:
+    ClusterName:
+        Type: String
+        Description: AWS EKS Cluster Name
+
 Resources:
   ClusterVPC:
     Type: AWS::EC2::VPC
@@ -7,7 +12,7 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: !Join ["-", ["AWS EKS Cluster VPC", !Ref "AWS::Region"]]
+          Value: !Join [" ", ["VPC for", !Ref ClusterName]]
 
   PublicSubnetA:
     Type: AWS::EC2::Subnet
