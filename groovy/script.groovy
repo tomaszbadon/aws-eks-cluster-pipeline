@@ -43,12 +43,12 @@ def fetchVpcIdAndLoadBalancerControllerRole() {
 }
 
 def deployAwsLoadBalancerServiceAccount() {
-    def fileContent = readFile('./k8s/load-balancer-service-account.yml')
+    def fileContent = readFile('./k8s/aws-load-balancer-controller-service-account.yml')
     fileContent = fileContent.replace('{{ROLE_ARN}}', env.LOAD_BALANCER_ROLE)
-    writeFile file: './k8s/load-balancer-service-account.yml', text: "${fileContent}"
+    writeFile file: './k8s/aws-load-balancer-controller-service-account.yml', text: "${fileContent}"
     echo fileContent
 
-    sh(script:'kubectl apply -f ./k8s/load-balancer-service-account.yml')
+    sh(script:'kubectl apply -f ./k8s/aws-load-balancer-controller-service-account.yml')
 }
 
 def installAwsLoadBalancerController() {
