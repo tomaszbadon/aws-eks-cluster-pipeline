@@ -7,7 +7,7 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: AWS EKS Cluster VPC
+          Value: !Join['-', ['AWS EKS Cluster VPC', !Ref "AWS::Region"]]
 
   PublicSubnetA:
     Type: AWS::EC2::Subnet
