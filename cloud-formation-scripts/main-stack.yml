@@ -1,12 +1,14 @@
 Parameters:
-    ClusterName:
-        Type: String
-        Description: AWS EKS Cluster Name
+  ClusterName:
+    Type: String
+    Description: AWS EKS Cluster Name
 
 Resources:
   NetworkStack:
     Type: AWS::CloudFormation::Stack
     Properties:
+      Parameters:
+        ClusterName: !Ref ClusterName
       TimeoutInMinutes: 10
       TemplateURL: https://bucket-with-stacks.s3.eu-central-1.amazonaws.com/network-template.yml
 
