@@ -21,9 +21,7 @@ Resources:
                           "Action": "sts:AssumeRoleWithWebIdentity",
                           "Condition": {
                             "StringEquals": {
-                              "oidc.eks.${AWS::Region}.amazonaws.com/id/${Id}:sub": "system:serviceaccount:${Namespace}:${ServiceAccount}",
-                              "oidc.eks.${AWS::Region}.amazonaws.com/id/${Id}:aud": "sts.amazonaws.com"
-                            }
+                              "oidc.eks.${AWS::Region}.amazonaws.com/id/${Id}:sub": "system:serviceaccount:${Namespace}:${ServiceAccount}"                            }
                           }
                         }
                       ]
