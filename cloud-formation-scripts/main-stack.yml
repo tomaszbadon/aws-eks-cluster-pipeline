@@ -51,6 +51,7 @@ Resources:
     Condition: IsEKSStackNeeded  
     Properties:
       Parameters:
+        ClusterName: !Ref ClusterName
         DefaultSecurityGroup: !GetAtt NetworkStack.Outputs.DefaultSecurityGroup
         PublicSubnetA: !GetAtt NetworkStack.Outputs.PublicSubnetA
         PublicSubnetB: !GetAtt NetworkStack.Outputs.PublicSubnetB
