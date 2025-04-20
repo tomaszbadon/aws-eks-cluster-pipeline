@@ -113,7 +113,6 @@ Resources:
 
 Outputs: 
   LoadBalancerControllerRole:
-    Condition: IsEKSStackNeeded
     Description: AwsLoadBalancerControllerRole
     Value: !GetAtt EksClusterRoles.Outputs.AwsLoadBalancerControllerRole
     Export:
