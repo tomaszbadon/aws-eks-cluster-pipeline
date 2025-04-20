@@ -94,7 +94,7 @@ pipeline {
                         script {
                             sh """aws cloudformation deploy \
                             --template-file ./cloud-formation-scripts/network-template.yml \
-                            --stack-name NETWORK_STACK_NAME \
+                            --stack-name $NETWORK_STACK_NAME \
                             --region $AWS_DEFAULT_REGION \
                             --parameter-overrides VpcName=$VPC_NAME
                             """
