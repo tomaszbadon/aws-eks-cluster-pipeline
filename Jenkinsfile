@@ -22,6 +22,7 @@ pipeline {
     }
 
     parameters {
+        string(name: 'STACK_NAME', defaultValue: 'eks-application-cluster', description: 'Cloud Formation Stack Name')
         booleanParam(name: 'CREATE_NETWORK_INFRASTRUCTURE', defaultValue: true, description: 'Create Network Infrastructure')
         booleanParam(name: 'CREATE_EC2_INFRASTRUCTURE', defaultValue: false, description: 'Create EC2 Infrastructure and Web Server')
         booleanParam(name: 'CREATE_EKS_INFRASTRUCTURE', defaultValue: false, description: 'Create EKS Infrastructure')
@@ -30,7 +31,6 @@ pipeline {
 
     environment {
         VPC_NAME = "Production-VPC"
-        STACK_NAME = 'eks-application-cluster'
         S3_BUCKET_NAME = 'bucket-with-stacks'
         EKS_CLUSTER_NAME = 'ApplicationEksCluster'
         AWS_CONTROLLER_RELEASE_NAME = 'aws-load-balancer-controller'
@@ -96,7 +96,7 @@ pipeline {
                         script {
                             sh """aws cloudformation deploy \
                             --template-file ./cloud-formation-scripts/main-stack.yml \
-                            --stack-name $STACK_NAME \
+                            --stack-name $params.STACK_NAME \
                             --region $params.AWS_REGION \
                             --capabilities CAPABILITY_NAMED_IAM \
                             --parameter-overrides S3BucketName=$S3_BUCKET_NAME VpcName=$VPC_NAME ClusterName=$EKS_CLUSTER_NAME CreateNetworkStack=$CREATE_NETWORK_INFRASTRUCTURE CreateEKSStack=$CREATE_EKS_INFRASTRUCTURE CreateEC2Stack=$CREATE_EC2_INFRASTRUCTURE
@@ -128,7 +128,7 @@ pipeline {
                         container('awscli') {
                             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                                 script {
-                                    gv.fetchVpcIdAndLoadBalancerControllerRole(STACK_NAME)
+                                    gv.fetchVpcIdAndLoadBalancerControllerRole(params.STACK_NAME)
                                 }
                             }
                         }
