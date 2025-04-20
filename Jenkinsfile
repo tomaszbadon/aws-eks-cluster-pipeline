@@ -80,6 +80,7 @@ pipeline {
                         echo "Hello World - $CREATE_EKS_INFRASTRUCTURE"
                         echo "Hello World3 - ${params.CREATE_EKS_INFRASTRUCTURE}"
                     }
+                }
             }
         }
 
