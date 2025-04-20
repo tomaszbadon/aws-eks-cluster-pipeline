@@ -61,14 +61,15 @@ Resources:
       TimeoutInMinutes: 10
       TemplateURL: https://bucket-with-stacks.s3.eu-central-1.amazonaws.com/eks.yml
 
-# Outputs:
-#   ApplicationEksClusterVpc:
-#     Description: VPC
-#     Value: !GetAtt NetworkStack.Outputs.ClusterVPC
-#     Export:
-#       Name: ApplicationEksClusterVpc
-#   LoadBalancerControllerRole:
-#     Description: AwsLoadBalancerControllerRole
-#     Value: !GetAtt EksClusterRoles.Outputs.AwsLoadBalancerControllerRole
-#     Export:
-#       Name: LoadBalancerControllerRole
+Outputs:
+  ApplicationEksClusterVpc:
+    Description: VPC
+    Value: !GetAtt NetworkStack.Outputs.ClusterVPC
+    Export:
+      Name: ApplicationEksClusterVpc
+  LoadBalancerControllerRole:
+    Condition: IsEKSStackNeeded
+    Description: AwsLoadBalancerControllerRole
+    Value: !GetAtt EksClusterRoles.Outputs.AwsLoadBalancerControllerRole
+    Export:
+      Name: LoadBalancerControllerRole
