@@ -67,9 +67,9 @@ Outputs:
     Value: !GetAtt NetworkStack.Outputs.ClusterVPC
     Export:
       Name: ApplicationEksClusterVpc
-  LoadBalancerControllerRole:
-    Condition: IsEKSStackNeeded
-    Description: AwsLoadBalancerControllerRole
-    Value: !GetAtt EksClusterRoles.Outputs.AwsLoadBalancerControllerRole
-    Export:
-      Name: LoadBalancerControllerRole
+  # LoadBalancerControllerRole:
+  #   Condition: IsEKSStackNeeded
+  #   Description: AwsLoadBalancerControllerRole
+  #   Value: !GetAtt EksClusterRoles.Outputs.AwsLoadBalancerControllerRole
+  #   Export:
+  #     Name: LoadBalancerControllerRole

@@ -110,3 +110,11 @@ Resources:
         EKSClusterEndpoint: !GetAtt EKSCluster.Endpoint
       TimeoutInMinutes: 10
       TemplateURL: https://bucket-with-stacks.s3.eu-central-1.amazonaws.com/eks-cluster-roles.yml
+
+Outputs: 
+  LoadBalancerControllerRole:
+    Condition: IsEKSStackNeeded
+    Description: AwsLoadBalancerControllerRole
+    Value: !GetAtt EksClusterRoles.Outputs.AwsLoadBalancerControllerRole
+    Export:
+      Name: LoadBalancerControllerRole
