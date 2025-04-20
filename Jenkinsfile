@@ -133,6 +133,11 @@ pipeline {
         }
 
         stage('Update kubectl') {
+            when {
+                expression {
+                    params.CREATE_EKS_INFRASTRUCTURE == 'true'
+                }
+            }
             steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
@@ -143,6 +148,11 @@ pipeline {
         }
 
         stage('Fetch VpcId and AwsLoadBalancerControllerRole') {
+            when {
+                expression {
+                    params.CREATE_EKS_INFRASTRUCTURE == 'true'
+                }
+            }
             steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
@@ -155,6 +165,11 @@ pipeline {
         }
 
         stage('Deploy AWS Load Balancer Service Account') {
+            when {
+                expression {
+                    params.CREATE_EKS_INFRASTRUCTURE == 'true'
+                }
+            }
             steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
@@ -167,6 +182,11 @@ pipeline {
         }
 
         stage('Check Ingress Controller') {
+            when {
+                expression {
+                    params.CREATE_EKS_INFRASTRUCTURE == 'true'
+                }
+            }
             steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
@@ -181,7 +201,7 @@ pipeline {
         stage('Install Ingress Controller') {
             when {
                 expression {
-                    env.AWS_LOAD_BALANCER_CONTROLLER_EXISTS == 'false'
+                    env.AWS_LOAD_BALANCER_CONTROLLER_EXISTS == 'false' && params.CREATE_EKS_INFRASTRUCTURE == 'true'
                 }
             }
             steps {
