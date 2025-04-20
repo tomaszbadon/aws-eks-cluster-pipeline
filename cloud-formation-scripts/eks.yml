@@ -13,13 +13,13 @@ Parameters:
     Description: PublicSubnetC
   PrivateSubnetX:
     Type: String
-    Description: PublicSubnetX
+    Description: PrivateSubnetX
   PrivateSubnetY:
     Type: String
-    Description: PublicSubnetY
+    Description: PrivateSubnetY
   PrivateSubnetZ:
     Type: String
-    Description: PublicSubnetZ
+    Description: PrivateSubnetZ
   DefaultSecurityGroup:
     Type: String
     Default: DefaultSecurityGroup
@@ -58,7 +58,7 @@ Resources:
 
   EKSCluster:
     Type: AWS::EKS::Cluster
-    DependsOn: [NetworkStack, EksClusterRole]
+    DependsOn: [EksClusterRole]
     Properties:
       Name: !Ref ClusterName
       RoleArn: !GetAtt EksClusterRole.Arn
