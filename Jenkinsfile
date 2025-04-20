@@ -22,6 +22,7 @@ pipeline {
     }
 
     parameters {
+        booleanParam(name: 'CREATE_NETWORK_INFRASTRUCTURE', defaultValue: true, description: 'Create Network Infrastructure')
         booleanParam(name: 'CREATE_EC2_INFRASTRUCTURE', defaultValue: false, description: 'Create EC2 Infrastructure and Web Server')
         booleanParam(name: 'CREATE_EKS_INFRASTRUCTURE', defaultValue: false, description: 'Create EKS Infrastructure')
     }
@@ -98,7 +99,7 @@ pipeline {
                             --stack-name $STACK_NAME \
                             --region $AWS_DEFAULT_REGION \
                             --capabilities CAPABILITY_NAMED_IAM \
-                            --parameter-overrides VpcName=$VPC_NAME ClusterName=$EKS_CLUSTER_NAME CreateEKSStack=$CREATE_EKS_INFRASTRUCTURE CreateEC2Stack=$CREATE_EC2_INFRASTRUCTURE
+                            --parameter-overrides VpcName=$VPC_NAME ClusterName=$EKS_CLUSTER_NAME CreateNetworkStack=$CREATE_NETWORK_INFRASTRUCTURE CreateEKSStack=$CREATE_EKS_INFRASTRUCTURE CreateEC2Stack=$CREATE_EC2_INFRASTRUCTURE
                             """
                         }
                     }

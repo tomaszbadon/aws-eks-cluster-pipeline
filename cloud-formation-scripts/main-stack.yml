@@ -5,6 +5,11 @@ Parameters:
   ClusterName:
     Type: String
     Description: AWS EKS Cluster Name
+  CreateNetworkStack:
+    Type: String
+    Default: false
+    Description: It determines if Network stack should be created
+    AllowedValues: [true, false]
   CreateEC2Stack:
     Type: String
     Default: false
@@ -17,6 +22,9 @@ Parameters:
     AllowedValues: [true, false]
 
 Conditions:
+  IsNetworkStackNeeded: !Equals
+    - !Ref CreateNetworkStack
+    - true
   IsEC2StackNeeded: !Equals
     - !Ref CreateEC2Stack
     - true
@@ -25,7 +33,9 @@ Conditions:
     - true
 
 Resources:
+
   NetworkStack:
+    Condition: IsNetworkStackNeeded
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
