@@ -55,9 +55,9 @@ Resources:
         PublicSubnetA: !GetAtt NetworkStack.Outputs.PublicSubnetA
         PublicSubnetB: !GetAtt NetworkStack.Outputs.PublicSubnetB
         PublicSubnetC: !GetAtt NetworkStack.Outputs.PublicSubnetC
-        PublicSubnetX: !GetAtt NetworkStack.Outputs.PublicSubnetX
-        PublicSubnetY: !GetAtt NetworkStack.Outputs.PublicSubnetY
-        PublicSubnetZ: !GetAtt NetworkStack.Outputs.PublicSubnetZ
+        PrivateSubnetX: !GetAtt NetworkStack.Outputs.PrivateSubnetX
+        PrivateSubnetY: !GetAtt NetworkStack.Outputs.PrivateSubnetY
+        PrivateSubnetZ: !GetAtt NetworkStack.Outputs.PrivateSubnetZ
       TimeoutInMinutes: 10
       TemplateURL: https://bucket-with-stacks.s3.eu-central-1.amazonaws.com/eks.yml
 
