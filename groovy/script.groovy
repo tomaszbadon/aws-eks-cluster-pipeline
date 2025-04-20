@@ -25,15 +25,15 @@ def awsLoadBalancerControllerExists() {
     env.AWS_LOAD_BALANCER_CONTROLLER_EXISTS = status == 0 ? 'true' : 'false'
 }
 
-def fetchVpcIdAndLoadBalancerControllerRole() {
+def fetchVpcIdAndLoadBalancerControllerRole(stackName) {
     def vpcId = sh(script: """aws cloudformation describe-stacks \
-        --stack-name eks-application-cluster \
+        --stack-name $stackName \
         --query 'Stacks[0].Outputs[?OutputKey==`ApplicationEksClusterVpc`].OutputValue' \
         --output text""", returnStdout: true).trim()
     echo "vpcId: ${vpcId}"
 
     def loadBalancerControllerRole = sh(script: """aws cloudformation describe-stacks \
-        --stack-name eks-application-cluster \
+        --stack-name $stackName \
         --query 'Stacks[0].Outputs[?OutputKey==`LoadBalancerControllerRoleArn`].OutputValue' \
         --output text""", returnStdout: true).trim()
     echo "LoadBalancerControllerRole: ${loadBalancerControllerRole}"
