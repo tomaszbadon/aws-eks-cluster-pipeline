@@ -87,7 +87,7 @@ pipeline {
         stage('Test') {
             when {
                 expression {
-                    params.CREATE_EKS_INFRASTRUCTURE == 'true'
+                    params.CREATE_EKS_INFRASTRUCTURE == true
                 }
             }
             steps {
@@ -150,7 +150,7 @@ pipeline {
         stage('Fetch VpcId and AwsLoadBalancerControllerRole') {
             when {
                 expression {
-                    params.CREATE_EKS_INFRASTRUCTURE == 'true'
+                    params.CREATE_EKS_INFRASTRUCTURE == true
                 }
             }
             steps {
@@ -167,7 +167,7 @@ pipeline {
         stage('Deploy AWS Load Balancer Service Account') {
             when {
                 expression {
-                    params.CREATE_EKS_INFRASTRUCTURE == 'true'
+                    params.CREATE_EKS_INFRASTRUCTURE == true
                 }
             }
             steps {
@@ -184,7 +184,7 @@ pipeline {
         stage('Check Ingress Controller') {
             when {
                 expression {
-                    params.CREATE_EKS_INFRASTRUCTURE == 'true'
+                    params.CREATE_EKS_INFRASTRUCTURE == true
                 }
             }
             steps {
@@ -201,7 +201,7 @@ pipeline {
         stage('Install Ingress Controller') {
             when {
                 expression {
-                    env.AWS_LOAD_BALANCER_CONTROLLER_EXISTS == 'false' && params.CREATE_EKS_INFRASTRUCTURE == 'true'
+                    env.AWS_LOAD_BALANCER_CONTROLLER_EXISTS == 'false' && params.CREATE_EKS_INFRASTRUCTURE == true
                 }
             }
             steps {
