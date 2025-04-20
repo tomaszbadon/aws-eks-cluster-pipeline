@@ -25,11 +25,11 @@ pipeline {
         booleanParam(name: 'CREATE_NETWORK_INFRASTRUCTURE', defaultValue: true, description: 'Create Network Infrastructure')
         booleanParam(name: 'CREATE_EC2_INFRASTRUCTURE', defaultValue: false, description: 'Create EC2 Infrastructure and Web Server')
         booleanParam(name: 'CREATE_EKS_INFRASTRUCTURE', defaultValue: false, description: 'Create EKS Infrastructure')
+        choice(name: 'AWS_REGION', choices: ['eu-central-1'], description: 'AWS Region') 
     }
 
     environment {
         VPC_NAME = "Production-VPC"
-        AWS_DEFAULT_REGION = 'eu-central-1'
         STACK_NAME = 'eks-application-cluster'
         S3_BUCKET_NAME = 'bucket-with-stacks'
         EKS_CLUSTER_NAME = 'ApplicationEksCluster'
@@ -97,7 +97,7 @@ pipeline {
                             sh """aws cloudformation deploy \
                             --template-file ./cloud-formation-scripts/main-stack.yml \
                             --stack-name $STACK_NAME \
-                            --region $AWS_DEFAULT_REGION \
+                            --region $params.AWS_REGION \
                             --capabilities CAPABILITY_NAMED_IAM \
                             --parameter-overrides VpcName=$VPC_NAME ClusterName=$EKS_CLUSTER_NAME CreateNetworkStack=$CREATE_NETWORK_INFRASTRUCTURE CreateEKSStack=$CREATE_EKS_INFRASTRUCTURE CreateEC2Stack=$CREATE_EC2_INFRASTRUCTURE
                             """
@@ -118,7 +118,7 @@ pipeline {
                     steps {
                         container('awscli') {
                             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                                sh "aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name $EKS_CLUSTER_NAME"
+                                sh "aws eks update-kubeconfig --region $params.AWS_REGION --name $EKS_CLUSTER_NAME"
                             }
                         }
                     }
