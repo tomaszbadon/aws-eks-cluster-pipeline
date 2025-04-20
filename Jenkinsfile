@@ -73,27 +73,21 @@ pipeline {
             }
         }
 
-        stage('Test2') {
-            steps {
-                container('awscli') {
-                    script {
-                        echo "Hello World - $CREATE_EKS_INFRASTRUCTURE"
-                        echo "Hello World3 - ${params.CREATE_EKS_INFRASTRUCTURE}"
-                    }
-                }
-            }
-        }
-
         stage('Test') {
             when {
                 expression {
                     params.CREATE_EKS_INFRASTRUCTURE == true
                 }
             }
-            steps {
-                container('awscli') {
-                    script {
-                        echo "Hello World - $CREATE_EKS_INFRASTRUCTURE"
+            stages {
+                stage('Stage 1') {
+                    steps {
+                        echo 'Hello World1'
+                    }
+                }
+                stage('Stage 2') {
+                    steps {
+                        echo 'Hello World2'
                     }
                 }
             }
