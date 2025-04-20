@@ -73,6 +73,21 @@ pipeline {
             }
         }
 
+        stage('Test') {
+            when {
+                expression {
+                    params.CREATE_EKS_INFRASTRUCTURE == 'true'
+                }
+            }
+            steps {
+                container('awscli') {
+                    script {
+                        echo "Hello World - $CREATE_EKS_INFRASTRUCTURE"
+                    }
+                }
+            }
+        }
+
         stage('Upload Cloud Formation templates to S3 Bucket') {
             steps {
                 container('awscli') {
