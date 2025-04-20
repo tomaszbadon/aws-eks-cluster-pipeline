@@ -78,6 +78,7 @@ Resources:
 
 Outputs:
   ApplicationEksClusterVpc:
+    Condition: IsNetworkStackNeeded
     Description: VPC
     Value: !GetAtt NetworkStack.Outputs.ClusterVPC
     Export:
