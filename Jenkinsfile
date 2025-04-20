@@ -158,7 +158,7 @@ pipeline {
                 stage('Install Ingress Controller') {
                     when {
                         expression {
-                            params.CREATE_EKS_INFRASTRUCTURE == true
+                            env.AWS_LOAD_BALANCER_CONTROLLER_EXISTS == 'false'
                         }
                     }
                     steps {
