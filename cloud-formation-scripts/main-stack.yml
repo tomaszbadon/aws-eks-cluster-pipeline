@@ -25,6 +25,7 @@ Resources:
   EC2Stack:
     Type: AWS::CloudFormation::Stack
     DependsOn: NetworkStack
+    Condition: IsEC2StackNeeded
     Properties:
       Parameters:
         PublicSubnetId: !GetAtt NetworkStack.Outputs.PublicSubnetA
@@ -32,7 +33,7 @@ Resources:
         DefaultSecurityGroup: !GetAtt NetworkStack.Outputs.DefaultSecurityGroup
       TimeoutInMinutes: 10
       TemplateURL: https://bucket-with-stacks.s3.eu-central-1.amazonaws.com/ec2-template.yml
-      Condition: IsEC2StackNeeded
+      
 
   EksClusterRole:
     Type: AWS::IAM::Role
