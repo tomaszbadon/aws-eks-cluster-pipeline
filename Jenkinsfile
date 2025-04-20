@@ -27,6 +27,8 @@ pipeline {
 
     environment {
         AWS_DEFAULT_REGION = 'eu-central-1'
+        NETWORK_STACK_NAME = 'network-stack'
+        VPC_NAME = 'netowrk-stack-vpc'
         STACK_NAME = 'eks-application-cluster'
         S3_BUCKET_NAME = 'bucket-with-stacks'
         EKS_CLUSTER_NAME = 'ApplicationEksCluster'
@@ -85,17 +87,16 @@ pipeline {
             }
         }
 
-        stage('Deploy Cloud Formation Stack') {
+        stage('Deploy Network Stack') {
             steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         script {
                             sh """aws cloudformation deploy \
-                            --template-file ./cloud-formation-scripts/main-stack.yml \
-                            --stack-name $STACK_NAME \
+                            --template-file ./cloud-formation-scripts/network-template.yml \
+                            --stack-name NETWORK_STACK_NAME \
                             --region $AWS_DEFAULT_REGION \
-                            --capabilities CAPABILITY_NAMED_IAM \
-                            --parameter-overrides ClusterName=$EKS_CLUSTER_NAME CreateEC2Stack=${params.CREATE_EC2_INFRASTRUCTURE}
+                            --parameter-overrides VpcName=$VPC_NAME
                             """
                         }
                     }
@@ -103,67 +104,67 @@ pipeline {
             }
         }
 
-        stage('Update kubectl') {
-            steps {
-                container('awscli') {
-                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        sh "aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name $EKS_CLUSTER_NAME"
-                    }
-                }
-            }
-        }
+        // stage('Update kubectl') {
+        //     steps {
+        //         container('awscli') {
+        //             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+        //                 sh "aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name $EKS_CLUSTER_NAME"
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Fetch VpcId and AwsLoadBalancerControllerRole') {
-            steps {
-                container('awscli') {
-                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        script {
-                            gv.fetchVpcIdAndLoadBalancerControllerRole()
-                        }
-                    }
-                }
-            }
-        }
+        // stage('Fetch VpcId and AwsLoadBalancerControllerRole') {
+        //     steps {
+        //         container('awscli') {
+        //             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+        //                 script {
+        //                     gv.fetchVpcIdAndLoadBalancerControllerRole()
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Deploy AWS Load Balancer Service Account') {
-            steps {
-                container('awscli') {
-                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        script {
-                            gv.deployAwsLoadBalancerServiceAccount()
-                        }
-                    }
-                }
-            }
-        }
+        // stage('Deploy AWS Load Balancer Service Account') {
+        //     steps {
+        //         container('awscli') {
+        //             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+        //                 script {
+        //                     gv.deployAwsLoadBalancerServiceAccount()
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Check Ingress Controller') {
-            steps {
-                container('awscli') {
-                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        script {
-                            gv.awsLoadBalancerControllerExists()
-                        }
-                    }
-                }
-            }
-        }
+        // stage('Check Ingress Controller') {
+        //     steps {
+        //         container('awscli') {
+        //             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+        //                 script {
+        //                     gv.awsLoadBalancerControllerExists()
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Install Ingress Controller') {
-            when {
-                expression {
-                    env.AWS_LOAD_BALANCER_CONTROLLER_EXISTS == 'false'
-                }
-            }
-            steps {
-                container('awscli') {
-                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        script {
-                            gv.installAwsLoadBalancerController()
-                        }
-                    }
-                }
-            }
-        }
+        // stage('Install Ingress Controller') {
+        //     when {
+        //         expression {
+        //             env.AWS_LOAD_BALANCER_CONTROLLER_EXISTS == 'false'
+        //         }
+        //     }
+        //     steps {
+        //         container('awscli') {
+        //             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+        //                 script {
+        //                     gv.installAwsLoadBalancerController()
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
     }
 }
