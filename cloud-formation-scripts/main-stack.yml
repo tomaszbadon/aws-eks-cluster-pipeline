@@ -58,7 +58,7 @@ Resources:
         PrivateSubnetId: !GetAtt NetworkStack.Outputs.PrivateSubnetX
         DefaultSecurityGroup: !GetAtt NetworkStack.Outputs.DefaultSecurityGroup
       TimeoutInMinutes: 10
-      TemplateURL: !Join ["", ["https://", "bucket-with-stacks.s3.eu-central-1.amazonaws.com/ec2-template.yml"]] 
+      TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.eu-central-1.amazonaws.com/ec2-template.yml"]] 
 
   EKSStack:
     Type: AWS::CloudFormation::Stack
