@@ -23,12 +23,11 @@ pipeline {
 
     parameters {
         booleanParam(name: 'CREATE_EC2_INFRASTRUCTURE', defaultValue: false, description: 'Create EC2 Infrastructure and Web Server')
+        booleanParam(name: 'CREATE_EKS_INFRASTRUCTURE', defaultValue: false, description: 'Create EKS Infrastructure')
     }
 
     environment {
         AWS_DEFAULT_REGION = 'eu-central-1'
-        NETWORK_STACK_NAME = 'network-stack'
-        VPC_NAME = 'netowrk-stack-vpc'
         STACK_NAME = 'eks-application-cluster'
         S3_BUCKET_NAME = 'bucket-with-stacks'
         EKS_CLUSTER_NAME = 'ApplicationEksCluster'
@@ -81,22 +80,24 @@ pipeline {
                             gv.uploadFileToS3Bucket('network-template.yml')
                             gv.uploadFileToS3Bucket('eks-cluster-roles.yml')
                             gv.uploadFileToS3Bucket('ec2-template.yml')
+                            gv.uploadFileToS3Bucket('eks.yml')
                         }
                     }
                 }
             }
         }
 
-        stage('Deploy Network Stack') {
+        stage('Deploy Cloud Formation Stack') {
             steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         script {
                             sh """aws cloudformation deploy \
-                            --template-file ./cloud-formation-scripts/network-template.yml \
-                            --stack-name $NETWORK_STACK_NAME \
+                            --template-file ./cloud-formation-scripts/main-stack.yml \
+                            --stack-name $STACK_NAME \
                             --region $AWS_DEFAULT_REGION \
-                            --parameter-overrides VpcName=$VPC_NAME
+                            --capabilities CAPABILITY_NAMED_IAM \
+                            --parameter-overrides ClusterName=$EKS_CLUSTER_NAME CreateEKSStack=$CREATE_EKS_INFRASTRUCTURE CreateEC2Stack=$CREATE_EC2_INFRASTRUCTURE
                             """
                         }
                     }

@@ -1,0 +1,112 @@
+Parameters:
+  ClusterName:
+    Type: String
+    Description: AWS EKS Cluster Name
+  PublicSubnetA:
+    Type: String
+    Description: PublicSubnetA
+  PublicSubnetB:
+    Type: String
+    Description: PublicSubnetB
+  PublicSubnetC:
+    Type: String
+    Description: PublicSubnetC
+  PrivateSubnetX:
+    Type: String
+    Description: PublicSubnetX
+  PrivateSubnetY:
+    Type: String
+    Description: PublicSubnetY
+  PrivateSubnetZ:
+    Type: String
+    Description: PublicSubnetZ
+  DefaultSecurityGroup:
+    Type: String
+    Default: DefaultSecurityGroup
+
+Resources:
+  EksClusterRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: EksClusterRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - eks.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns: [arn:aws:iam::aws:policy/AmazonEKSClusterPolicy]
+
+  EksNodesRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: EksNodesRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+
+  EKSCluster:
+    Type: AWS::EKS::Cluster
+    DependsOn: [NetworkStack, EksClusterRole]
+    Properties:
+      Name: !Ref ClusterName
+      RoleArn: !GetAtt EksClusterRole.Arn
+      ResourcesVpcConfig:
+        EndpointPrivateAccess: false
+        EndpointPublicAccess: true
+        SecurityGroupIds:
+          - !Ref DefaultSecurityGroup
+        SubnetIds:
+          - !Ref PublicSubnetA
+          - !Ref PublicSubnetB
+          - !Ref PublicSubnetC
+          - !Ref PrivateSubnetX
+          - !Ref PrivateSubnetY
+          - !Ref PrivateSubnetZ
+
+  NodeGroup:
+    Type: AWS::EKS::Nodegroup
+    DependsOn: [EKSCluster]
+    Properties:
+      ClusterName: !Ref EKSCluster
+      NodegroupName: EksNodeGroup
+      NodeRole: !GetAtt EksNodesRole.Arn
+      Subnets:
+        - !Ref PrivateSubnetX
+        - !Ref PrivateSubnetY
+        - !Ref PrivateSubnetZ
+      ScalingConfig:
+        DesiredSize: 1
+        MinSize: 0
+        MaxSize: 2
+      InstanceTypes:
+        - t2.small
+
+  OidcProvider:
+    Type: "AWS::IAM::OIDCProvider"
+    DependsOn: EKSCluster
+    Properties:
+      ClientIdList:
+        - "*"
+        - "sts.amazonaws.com"
+      Url: !GetAtt EKSCluster.OpenIdConnectIssuerUrl
+
+  EksClusterRoles:
+    Type: "AWS::CloudFormation::Stack"
+    DependsOn: EKSCluster
+    Properties:
+      Parameters:
+        EKSClusterEndpoint: !GetAtt EKSCluster.Endpoint
+      TimeoutInMinutes: 10
+      TemplateURL: https://bucket-with-stacks.s3.eu-central-1.amazonaws.com/eks-cluster-roles.yml
