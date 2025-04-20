@@ -27,6 +27,7 @@ pipeline {
     }
 
     environment {
+        VPC_NAME = "Production VPC"
         AWS_DEFAULT_REGION = 'eu-central-1'
         STACK_NAME = 'eks-application-cluster'
         S3_BUCKET_NAME = 'bucket-with-stacks'
@@ -97,7 +98,7 @@ pipeline {
                             --stack-name $STACK_NAME \
                             --region $AWS_DEFAULT_REGION \
                             --capabilities CAPABILITY_NAMED_IAM \
-                            --parameter-overrides ClusterName=$EKS_CLUSTER_NAME CreateEKSStack=$CREATE_EKS_INFRASTRUCTURE CreateEC2Stack=$CREATE_EC2_INFRASTRUCTURE
+                            --parameter-overrides VpcName=$VPC_NAME ClusterName=$EKS_CLUSTER_NAME CreateEKSStack=$CREATE_EKS_INFRASTRUCTURE CreateEC2Stack=$CREATE_EC2_INFRASTRUCTURE
                             """
                         }
                     }
