@@ -27,7 +27,7 @@ pipeline {
     }
 
     environment {
-        VPC_NAME = "Production VPC"
+        VPC_NAME = "Production-VPC"
         AWS_DEFAULT_REGION = 'eu-central-1'
         STACK_NAME = 'eks-application-cluster'
         S3_BUCKET_NAME = 'bucket-with-stacks'
