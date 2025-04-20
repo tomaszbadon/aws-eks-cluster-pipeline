@@ -21,6 +21,10 @@ pipeline {
         }
     }
 
+    parameters {
+        booleanParam(name: 'CREATE_EC2_INFRASTRUCTURE', defaultValue: false, description: 'Create EC2 Infrastructure and Web Server')
+    }
+
     environment {
         AWS_DEFAULT_REGION = 'eu-central-1'
         STACK_NAME = 'eks-application-cluster'
@@ -91,7 +95,7 @@ pipeline {
                             --stack-name $STACK_NAME \
                             --region $AWS_DEFAULT_REGION \
                             --capabilities CAPABILITY_NAMED_IAM \
-                            --parameter-overrides ClusterName=$EKS_CLUSTER_NAME
+                            --parameter-overrides ClusterName=$EKS_CLUSTER_NAME CreateEC2Stack=${params.CREATE_EC2_INFRASTRUCTURE}
                             """
                         }
                     }

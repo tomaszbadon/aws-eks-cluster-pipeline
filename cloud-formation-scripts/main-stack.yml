@@ -2,6 +2,16 @@ Parameters:
   ClusterName:
     Type: String
     Description: AWS EKS Cluster Name
+  CreateEC2Stack:
+    Type: String
+    Default: false
+    Description: It determines if EC2 stack should be created
+    AllowedValues: [true, false]
+
+Conditions:
+  IsEC2StackNeeded: !Equals
+    - !Ref CreateEC2Stack
+    - true
 
 Resources:
   NetworkStack:
@@ -12,16 +22,17 @@ Resources:
       TimeoutInMinutes: 10
       TemplateURL: https://bucket-with-stacks.s3.eu-central-1.amazonaws.com/network-template.yml
 
-  #  EC2Stack:
-  #    Type: AWS::CloudFormation::Stack
-  #    DependsOn: NetworkStack
-  #    Properties:
-  #      Parameters:
-  #        PublicSubnetId: !GetAtt NetworkStack.Outputs.PublicSubnetA
-  #        PrivateSubnetId: !GetAtt NetworkStack.Outputs.PrivateSubnetX
-  #        DefaultSecurityGroup: !GetAtt NetworkStack.Outputs.DefaultSecurityGroup
-  #      TimeoutInMinutes: 10
-  #      TemplateURL: https://bucket-with-stacks.s3.eu-central-1.amazonaws.com/ec2-template.yml
+  EC2Stack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: NetworkStack
+    Properties:
+      Parameters:
+        PublicSubnetId: !GetAtt NetworkStack.Outputs.PublicSubnetA
+        PrivateSubnetId: !GetAtt NetworkStack.Outputs.PrivateSubnetX
+        DefaultSecurityGroup: !GetAtt NetworkStack.Outputs.DefaultSecurityGroup
+      TimeoutInMinutes: 10
+      TemplateURL: https://bucket-with-stacks.s3.eu-central-1.amazonaws.com/ec2-template.yml
+      Condition: IsEC2StackNeeded
 
   EksClusterRole:
     Type: AWS::IAM::Role
