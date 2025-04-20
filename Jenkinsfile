@@ -135,7 +135,7 @@ pipeline {
         stage('Update kubectl') {
             when {
                 expression {
-                    params.CREATE_EKS_INFRASTRUCTURE == 'true'
+                    params.CREATE_EKS_INFRASTRUCTURE == true
                 }
             }
             steps {
