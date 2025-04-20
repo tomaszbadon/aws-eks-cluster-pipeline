@@ -71,6 +71,6 @@ Outputs:
   LoadBalancerControllerRoleArn:
     Condition: IsEKSStackNeeded
     Description: AwsLoadBalancerControllerRole
-    Value: !GetAtt EKSStack.Outputs.AwsLoadBalancerControllerRole
+    Value: !GetAtt EKSStack.Outputs.LoadBalancerControllerRole
     Export:
       Name: LoadBalancerControllerRoleArn
