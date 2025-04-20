@@ -45,8 +45,7 @@ Resources:
       Parameters:
         VpcName: !Ref VpcName
       TimeoutInMinutes: 10
-      TemplateURL: !Join ["", ["https://", "bucket-with-stacks.s3.eu-central-1.amazonaws.com/network-template.yml"]] 
-
+      TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/network-template.yml"]]
 
   EC2Stack:
     Type: AWS::CloudFormation::Stack
@@ -75,7 +74,7 @@ Resources:
         PrivateSubnetY: !GetAtt NetworkStack.Outputs.PrivateSubnetY
         PrivateSubnetZ: !GetAtt NetworkStack.Outputs.PrivateSubnetZ
       TimeoutInMinutes: 10
-      TemplateURL: !Join ["", ["https://", "bucket-with-stacks.s3.eu-central-1.amazonaws.com/eks.yml"]] 
+      TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/eks.yml"]] 
 
 Outputs:
   ApplicationEksClusterVpc:
