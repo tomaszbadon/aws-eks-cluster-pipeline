@@ -13,7 +13,7 @@ Resources:
   EC2Role:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: EksNodesRoleForEC2
+      RoleName: Role4EC2WebServer
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -31,7 +31,7 @@ Resources:
                   - eks:ListClusters
                 Resource: "*"
 
-  EksEC2InstanceProfile:
+  EC2InstanceProfile:
     DependsOn: EC2Role
     Type: "AWS::IAM::InstanceProfile"
     Properties:
@@ -39,13 +39,13 @@ Resources:
         - !Ref EC2Role
 
   MyEC2InstancePublic:
-    DependsOn: EksEC2InstanceProfile
+    DependsOn: EC2InstanceProfile
     Type: "AWS::EC2::Instance"
     Properties:
       InstanceType: t2.micro
       KeyName: my-application-key
       ImageId: ami-0dac2efb38d54a859
-      IamInstanceProfile: !Ref EksEC2InstanceProfile
+      IamInstanceProfile: !Ref EC2InstanceProfile
       NetworkInterfaces:
         - AssociatePublicIpAddress: true
           DeviceIndex: 0
@@ -58,6 +58,9 @@ Resources:
           sudo yum update -y
           sudo yum install httpd -y
           sudo systemctl start httpd
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
 
   MyEC2InstancePrivate:
     Type: "AWS::EC2::Instance"
