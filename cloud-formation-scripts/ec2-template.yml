@@ -60,7 +60,16 @@ Resources:
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
           unzip awscliv2.zip
           sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+          sudo cp /etc/apt/sources.list /etc/apt/backup.txt 
+          cat <<EOF | sudo tee /etc/apt/sources.list
+          deb http://archive.ubuntu.com/ubuntu $(lsb_release -cs) main restricted universe multiverse
+          deb http://archive.ubuntu.com/ubuntu $(lsb_release -cs)-updates main restricted universe multiverse
+          deb http://archive.ubuntu.com/ubuntu $(lsb_release -cs)-security main restricted universe multiverse
+          deb http://archive.ubuntu.com/ubuntu $(lsb_release -cs)-backports main universe restricted multiverse
+          EOF
+          sudo apt update
           sudo apt install apache2
+          sudo apt install php libapache2-mod-php
 
   MyEC2InstancePrivate:
     Type: "AWS::EC2::Instance"
