@@ -53,9 +53,11 @@ Resources:
             - !Ref DefaultSecurityGroup
           SubnetId: !Ref PublicSubnetId
       UserData:
-        Fn::Base64: |
+        Fn::Base64: !Sub |
           #!/bin/bash
-          sudo yum remove awscli
+          sudo yum update -y
+          sudo yum install httpd -y
+          sudo systemctl start httpd
 
   MyEC2InstancePrivate:
     Type: "AWS::EC2::Instance"
