@@ -44,7 +44,7 @@ Resources:
     Properties:
       InstanceType: t2.micro
       KeyName: my-application-key
-      ImageId: ami-02879589cb2a0e4ea
+      ImageId: ami-0dac2efb38d54a859
       IamInstanceProfile: !Ref EksEC2InstanceProfile
       NetworkInterfaces:
         - AssociatePublicIpAddress: true
@@ -62,7 +62,7 @@ Resources:
     Properties:
       InstanceType: t2.micro
       KeyName: my-application-key
-      ImageId: ami-02879589cb2a0e4ea
+      ImageId: ami-0dac2efb38d54a859
       NetworkInterfaces:
         - AssociatePublicIpAddress: false
           DeviceIndex: 0
