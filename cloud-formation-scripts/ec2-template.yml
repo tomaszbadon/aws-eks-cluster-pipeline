@@ -94,10 +94,6 @@ Resources:
     DependsOn: MyTargetGroup
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      LoadBalancerAttributes: 
-        - LoadBalancerAttribute
-      MinimumLoadBalancerCapacity: 
-        MinimumLoadBalancerCapacity
       Name: MyLoadBalancer
       Scheme: internet-facing
       SecurityGroups: 
