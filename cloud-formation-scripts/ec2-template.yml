@@ -75,7 +75,7 @@ Resources:
             - !Ref DefaultSecurityGroup
           SubnetId: !Ref PrivateSubnetId
 
-  TargetGroup:
+  MyTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Name: "MyTargetGroup"
