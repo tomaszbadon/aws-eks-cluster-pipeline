@@ -62,7 +62,6 @@ Resources:
           sudo yum install httpd -y
           sudo systemctl start httpd
 
-
   MyEC2InstancePrivate:
     Type: "AWS::EC2::Instance"
     Properties:
@@ -76,17 +75,18 @@ Resources:
             - !Ref DefaultSecurityGroup
           SubnetId: !Ref PrivateSubnetId
 
-  Type: AWS::ElasticLoadBalancingV2::TargetGroup
-  Properties:
-    Name: "MyTargetGroup"
-    Port: 80
-    Protocol: HTTP
-    ProtocolVersion: String
-    TargetGroupAttributes: 
-      - TargetGroupAttribute
-    Targets: 
-      - AvailabilityZone: String
-        Id: !GetAtt MyEC2InstancePublic.InstanceId
-        Port: 80
-    TargetType: instance
-    VpcId: !Ref VpcId
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: "MyTargetGroup"
+      Port: 80
+      Protocol: HTTP
+      ProtocolVersion: String
+      TargetGroupAttributes:
+        - TargetGroupAttribute
+      Targets:
+        - AvailabilityZone: String
+          Id: !GetAtt MyEC2InstancePublic.InstanceId
+          Port: 80
+      TargetType: instance
+      VpcId: !Ref VpcId
