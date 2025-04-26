@@ -76,13 +76,13 @@ Resources:
           SubnetId: !Ref PrivateSubnetId
 
   MyTargetGroup:
+    DependsOn: MyEC2InstancePublic
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Name: "MyTargetGroup"
       Port: 80
       Protocol: HTTP
-      Targets:
-          Id: !GetAtt MyEC2InstancePublic.InstanceId
-          Port: 80
-      TargetType: instance
+      # Targets:
+      #     Id: !GetAtt MyEC2InstancePublic.InstanceId
+      #     Port: 80
       VpcId: !Ref VpcId
