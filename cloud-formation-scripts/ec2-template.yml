@@ -81,9 +81,6 @@ Resources:
       Name: "MyTargetGroup"
       Port: 80
       Protocol: HTTP
-      ProtocolVersion: String
-      TargetGroupAttributes:
-        - TargetGroupAttribute
       Targets:
         - AvailabilityZone: String
           Id: !GetAtt MyEC2InstancePublic.InstanceId
