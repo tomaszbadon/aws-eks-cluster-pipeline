@@ -91,7 +91,6 @@ Resources:
       VpcId: !Ref VpcId
 
   MyLoadBalancer:
-    DependsOn: MyTargetGroup
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Name: MyLoadBalancer
@@ -104,9 +103,12 @@ Resources:
       Type: application
 
   Listener:
+    DependsOn: 
+      - MyTargetGroup
+      - MyLoadBalancer
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       Actions:
         - Type: forward
-          TargetGroupArn: !Ref MyTargetGroup
-      LoadBalancerArn: !Ref MyLoadBalancer
+          TargetGroupArn: !GetAtt MyTargetGroup.Arn
+      LoadBalancerArn: !GetAtt MyLoadBalancer.Arn
