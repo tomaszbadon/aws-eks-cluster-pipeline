@@ -82,7 +82,6 @@ Resources:
       Port: 80
       Protocol: HTTP
       Targets:
-        - AvailabilityZone: String
           Id: !GetAtt MyEC2InstancePublic.InstanceId
           Port: 80
       TargetType: instance
