@@ -82,7 +82,7 @@ Resources:
       Name: "MyTargetGroup"
       Port: 80
       Protocol: HTTP
-      # Targets:
-      #     Id: !GetAtt MyEC2InstancePublic.InstanceId
-      #     Port: 80
+      Targets:
+        - Id: !GetAtt MyEC2InstancePublic.InstanceId
+          Port: 80
       VpcId: !Ref VpcId
