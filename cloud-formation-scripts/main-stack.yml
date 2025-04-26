@@ -53,7 +53,7 @@ Resources:
     Condition: IsEC2StackNeeded
     Properties:
       Parameters:
-        VpcId: !GetAtt NetworkStack NetworkStack.Outputs.ClusterVPC
+        VpcId: !GetAtt NetworkStack.Outputs.ClusterVPC
         PublicSubnetId: !GetAtt NetworkStack.Outputs.PublicSubnetA
         PrivateSubnetId: !GetAtt NetworkStack.Outputs.PrivateSubnetX
         DefaultSecurityGroup: !GetAtt NetworkStack.Outputs.DefaultSecurityGroup
