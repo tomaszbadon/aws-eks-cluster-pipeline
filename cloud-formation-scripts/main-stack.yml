@@ -54,7 +54,8 @@ Resources:
     Properties:
       Parameters:
         VpcId: !GetAtt NetworkStack.Outputs.ClusterVPC
-        PublicSubnetId: !GetAtt NetworkStack.Outputs.PublicSubnetA
+        PublicSubnetIdA: !GetAtt NetworkStack.Outputs.PublicSubnetA
+        PublicSubnetIdB: !GetAtt NetworkStack.Outputs.PublicSubnetB
         PrivateSubnetId: !GetAtt NetworkStack.Outputs.PrivateSubnetX
         DefaultSecurityGroup: !GetAtt NetworkStack.Outputs.DefaultSecurityGroup
       TimeoutInMinutes: 10
