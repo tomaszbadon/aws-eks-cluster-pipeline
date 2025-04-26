@@ -106,9 +106,14 @@ Resources:
     DependsOn: 
       - MyTargetGroup
       - MyLoadBalancer
-    Type: AWS::ElasticLoadBalancingV2::Listener
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
     Properties:
-      Actions:
+      DefaultActions:
         - Type: forward
-          TargetGroupArn: !GetAtt MyTargetGroup.Arn
+          ForwardConfig:
+            TargetGroups:
+              - TargetGroupArn: !GetAtt MyTargetGroup.Arn
+                Weight: 1
       LoadBalancerArn: !GetAtt MyLoadBalancer.Arn
+      Port: 80
+      Protocol: HTTP
