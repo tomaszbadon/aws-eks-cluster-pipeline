@@ -102,18 +102,16 @@ Resources:
         - !Ref PublicSubnetIdB
       Type: application
 
-  # Listener:
-  #   DependsOn: 
-  #     - MyTargetGroup
-  #     - MyLoadBalancer
-  #   Type: 'AWS::ElasticLoadBalancingV2::Listener'
-  #   Properties:
-  #     DefaultActions:
-  #       - Type: forward
-  #         ForwardConfig:
-  #           TargetGroups:
-  #             - TargetGroupArn: !GetAtt MyTargetGroup.Arn
-  #               Weight: 1
-  #     LoadBalancerArn: !GetAtt MyLoadBalancer.Arn
-  #     Port: 80
-  #     Protocol: HTTP
+  Listener:
+    DependsOn: 
+      - MyTargetGroup
+      - MyLoadBalancer
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        TargetGroupArn: !Ref MyTargetGroup
+        Type: forward
+      LoadBalancerArn: !Ref MyLoadBalancer
+      Port: 80
+      Protocol: HTTP
+
