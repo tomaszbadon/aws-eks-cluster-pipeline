@@ -63,6 +63,7 @@ Resources:
           #!/bin/bash
           sudo yum update -y
           sudo yum install httpd -y
+          sudo yum install php -y
           sudo systemctl start httpd
 
   MyEC2InstancePrivate:
@@ -82,6 +83,7 @@ Resources:
           #!/bin/bash
           sudo yum update -y
           sudo yum install httpd -y
+          sudo yum install php -y
           sudo systemctl start httpd
 
   MyTargetGroup:
