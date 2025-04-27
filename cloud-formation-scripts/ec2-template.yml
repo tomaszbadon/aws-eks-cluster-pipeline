@@ -77,6 +77,12 @@ Resources:
           GroupSet:
             - !Ref DefaultSecurityGroup
           SubnetId: !Ref PrivateSubnetId
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo yum update -y
+          sudo yum install httpd -y
+          sudo systemctl start httpd
 
   MyTargetGroup:
     DependsOn: MyEC2InstancePublic
