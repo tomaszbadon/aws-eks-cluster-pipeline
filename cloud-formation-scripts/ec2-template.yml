@@ -103,18 +103,18 @@ Resources:
     Properties:
       Name: MyLoadBalancer
       Scheme: internet-facing
-      SecurityGroups: 
+      SecurityGroups:
         - !Ref DefaultSecurityGroup
-      Subnets: 
+      Subnets:
         - !Ref PublicSubnetIdA
         - !Ref PublicSubnetIdB
       Type: application
 
   Listener:
-    DependsOn: 
+    DependsOn:
       - MyTargetGroup
       - MyLoadBalancer
-    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Type: "AWS::ElasticLoadBalancingV2::Listener"
     Properties:
       DefaultActions:
         TargetGroupArn: !Ref MyTargetGroup
@@ -123,3 +123,13 @@ Resources:
       Port: 80
       Protocol: HTTP
 
+  LoadBalancerRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      AliasTarget:
+        DNSName: !GetAtt MyLoadBalancer.DNSName
+        HostedZoneId: !GetAtt MyLoadBalancer.CanonicalHostedZoneID
+      HostedZoneName: code-grinder.click
+      Name: code-grinder.click
+      Type: A
+      EvaluateTargetHealth: false
