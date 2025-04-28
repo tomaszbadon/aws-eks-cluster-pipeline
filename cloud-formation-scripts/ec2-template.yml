@@ -129,6 +129,6 @@ Resources:
       AliasTarget:
         DNSName: !GetAtt MyLoadBalancer.DNSName
         HostedZoneId: !GetAtt MyLoadBalancer.CanonicalHostedZoneID
-      HostedZoneName: code-grinder.click
+      HostedZoneName: code-grinder.click.
       Name: code-grinder.click
       Type: A
