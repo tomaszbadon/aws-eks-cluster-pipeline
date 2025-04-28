@@ -31,7 +31,7 @@ Resources:
               Service: ec2.amazonaws.com
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: !Join [ '-', [ !Ref "AWS::Region"  !Ref StackName, "S3", "Access", "Role"] ]
+        - PolicyName: !Join [ '-', [ !Ref "AWS::Region", !Ref StackName, "S3", "Access", "Role"] ]
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
