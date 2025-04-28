@@ -22,7 +22,7 @@ Resources:
   EC2Role:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Join [ '-', [ !Ref "AWS::Region"  !Ref StackName, "EC2" "Role"] ]
+      RoleName: !Join [ '-', [ !Ref "AWS::Region"  !Ref StackName, "EC2", "Role"] ]
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
