@@ -132,4 +132,3 @@ Resources:
       HostedZoneName: code-grinder.click
       Name: code-grinder.click
       Type: A
-      EvaluateTargetHealth: false
