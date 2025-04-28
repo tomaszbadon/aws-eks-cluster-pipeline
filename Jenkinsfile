@@ -99,7 +99,7 @@ pipeline {
                             --stack-name $params.STACK_NAME \
                             --region $params.AWS_REGION \
                             --capabilities CAPABILITY_NAMED_IAM \
-                            --parameter-overrides S3BucketName=$S3_BUCKET_NAME VpcName=$VPC_NAME ClusterName=$EKS_CLUSTER_NAME CreateNetworkStack=$CREATE_NETWORK_INFRASTRUCTURE CreateEKSStack=$CREATE_EKS_INFRASTRUCTURE CreateEC2Stack=$CREATE_EC2_INFRASTRUCTURE
+                            --parameter-overrides StackName=$params.STACK_NAME S3BucketName=$S3_BUCKET_NAME VpcName=$VPC_NAME ClusterName=$EKS_CLUSTER_NAME CreateNetworkStack=$CREATE_NETWORK_INFRASTRUCTURE CreateEKSStack=$CREATE_EKS_INFRASTRUCTURE CreateEC2Stack=$CREATE_EC2_INFRASTRUCTURE
                             """
                         }
                     }

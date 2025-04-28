@@ -1,4 +1,7 @@
 Parameters:
+  StackName:
+    Type: String
+    Description: "Main Stack Name"
   S3BucketName:
     Type: String
     Description: "Cloud Foramation S3 Bucket"
@@ -53,6 +56,7 @@ Resources:
     Condition: IsEC2StackNeeded
     Properties:
       Parameters:
+        StackName: !Ref StackName
         VpcId: !GetAtt NetworkStack.Outputs.ClusterVPC
         PublicSubnetIdA: !GetAtt NetworkStack.Outputs.PublicSubnetA
         PublicSubnetIdB: !GetAtt NetworkStack.Outputs.PublicSubnetB

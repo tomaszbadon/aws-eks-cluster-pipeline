@@ -1,4 +1,7 @@
 Parameters:
+  StackName:
+    Type: String
+    Description: "Main Stack Name"
   DefaultSecurityGroup:
     Type: String
     Description: Default Security Group
@@ -19,7 +22,7 @@ Resources:
   EC2Role:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: Role4EC2WebServer
+      RoleName: !Join [ '-', [ !Ref "AWS::Region",  !Ref StackName, "EC2", "Role"] ]
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
