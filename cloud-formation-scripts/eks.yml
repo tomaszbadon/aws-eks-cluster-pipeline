@@ -1,4 +1,7 @@
 Parameters:
+  StackName:
+    Type: String
+    Description: "Main Stack Name"
   ClusterName:
     Type: String
     Description: AWS EKS Cluster Name
@@ -107,6 +110,7 @@ Resources:
     DependsOn: EKSCluster
     Properties:
       Parameters:
+        StackName: !Ref StackName
         EKSClusterEndpoint: !GetAtt EKSCluster.Endpoint
       TimeoutInMinutes: 10
       TemplateURL: https://bucket-with-stacks.s3.eu-central-1.amazonaws.com/eks-cluster-roles.yml
