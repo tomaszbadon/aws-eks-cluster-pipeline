@@ -10,7 +10,7 @@ Resources:
     AwsLoadBalancerControllerRole:
         Type: AWS::IAM::Role
         Properties:
-            RoleName: !Join [ '-', [ !Ref "AWS::Region", !Ref StackName, "EKSLoadBalancerControllerRole"] ]
+            RoleName: !Join [ '-', [ !Ref "AWS::Region", !Ref StackName, "LBCRole"] ]
             AssumeRolePolicyDocument: !Sub
                 - |
                     {
