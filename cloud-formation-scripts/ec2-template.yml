@@ -1,19 +1,28 @@
 Parameters:
+  StackName:
+    Type: String
+    Description: "Main Stack Name"
   DefaultSecurityGroup:
     Type: String
     Description: Default Security Group
-  PublicSubnetId:
+  PublicSubnetIdA:
     Type: String
-    Description: Public Subnet
+    Description: Public Subnet A
+  PublicSubnetIdB:
+    Type: String
+    Description: Public Subnet B
   PrivateSubnetId:
     Type: String
     Description: Private Subnet
+  VpcId:
+    Type: String
+    Description: VpcId
 
 Resources:
   EC2Role:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: EksNodesRoleForEC2
+      RoleName: !Join [ '-', [ !Ref "AWS::Region", !Ref StackName, "EC2", "Role"] ]
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -22,16 +31,74 @@ Resources:
               Service: ec2.amazonaws.com
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: ListEksClustersPolicy
+        - PolicyName: !Join [ '-', [ !Ref "AWS::Region", !Ref StackName, "S3", "Access", "Role"] ]
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
-                  - eks:ListClusters
-                Resource: "*"
+                  - "s3:GetObjectVersionTagging"
+                  - "s3:GetStorageLensConfigurationTagging"
+                  - "s3:GetObjectAcl"
+                  - "s3:GetBucketObjectLockConfiguration"
+                  - "s3:GetIntelligentTieringConfiguration"
+                  - "s3:GetStorageLensGroup"
+                  - "s3:GetAccessGrantsInstanceForPrefix"
+                  - "s3:GetObjectVersionAcl"
+                  - "s3:GetBucketPolicyStatus"
+                  - "s3:GetAccessGrantsLocation"
+                  - "s3:GetObjectRetention"
+                  - "s3:GetBucketWebsite"
+                  - "s3:GetJobTagging"
+                  - "s3:GetMultiRegionAccessPoint"
+                  - "s3:GetObjectAttributes"
+                  - "s3:GetAccessGrantsInstanceResourcePolicy"
+                  - "s3:GetObjectLegalHold"
+                  - "s3:GetBucketNotification"
+                  - "s3:DescribeMultiRegionAccessPointOperation"
+                  - "s3:GetReplicationConfiguration"
+                  - "s3:GetObject"
+                  - "s3:GetBucketMetadataTableConfiguration"
+                  - "s3:DescribeJob"
+                  - "s3:GetAnalyticsConfiguration"
+                  - "s3:GetObjectVersionForReplication"
+                  - "s3:GetAccessPointForObjectLambda"
+                  - "s3:GetStorageLensDashboard"
+                  - "s3:GetLifecycleConfiguration"
+                  - "s3:GetInventoryConfiguration"
+                  - "s3:GetBucketTagging"
+                  - "s3:GetAccessPointPolicyForObjectLambda"
+                  - "s3:GetBucketLogging"
+                  - "s3:GetAccessGrant"
+                  - "s3:GetAccelerateConfiguration"
+                  - "s3:GetObjectVersionAttributes"
+                  - "s3:GetBucketPolicy"
+                  - "s3:GetEncryptionConfiguration"
+                  - "s3:GetObjectVersionTorrent"
+                  - "s3:GetBucketRequestPayment"
+                  - "s3:GetAccessPointPolicyStatus"
+                  - "s3:GetAccessGrantsInstance"
+                  - "s3:GetObjectTagging"
+                  - "s3:GetMetricsConfiguration"
+                  - "s3:GetBucketOwnershipControls"
+                  - "s3:GetBucketPublicAccessBlock"
+                  - "s3:GetMultiRegionAccessPointPolicyStatus"
+                  - "s3:GetMultiRegionAccessPointPolicy"
+                  - "s3:GetAccessPointPolicyStatusForObjectLambda"
+                  - "s3:GetDataAccess"
+                  - "s3:GetBucketVersioning"
+                  - "s3:GetBucketAcl"
+                  - "s3:GetAccessPointConfigurationForObjectLambda"
+                  - "s3:GetObjectTorrent"
+                  - "s3:GetMultiRegionAccessPointRoutes"
+                  - "s3:GetStorageLensConfiguration"
+                  - "s3:GetBucketCORS"
+                  - "s3:GetBucketLocation"
+                  - "s3:GetAccessPointPolicy"
+                  - "s3:GetObjectVersion"
+                Resource: "arn:aws:s3:::phpsrc"
 
-  EksEC2InstanceProfile:
+  EC2InstanceProfile:
     DependsOn: EC2Role
     Type: "AWS::IAM::InstanceProfile"
     Properties:
@@ -39,37 +106,90 @@ Resources:
         - !Ref EC2Role
 
   MyEC2InstancePublic:
-    DependsOn: EksEC2InstanceProfile
+    DependsOn: EC2InstanceProfile
     Type: "AWS::EC2::Instance"
     Properties:
       InstanceType: t2.micro
       KeyName: my-application-key
-      ImageId: ami-0e872aee57663ae2d
-      IamInstanceProfile: !Ref EksEC2InstanceProfile
+      ImageId: ami-0dac2efb38d54a859
+      IamInstanceProfile: !Ref EC2InstanceProfile
       NetworkInterfaces:
         - AssociatePublicIpAddress: true
           DeviceIndex: 0
           GroupSet:
             - !Ref DefaultSecurityGroup
-          SubnetId: !Ref PublicSubnetId
+          SubnetId: !Ref PublicSubnetIdA
       UserData:
-        Fn::Base64: |
+        Fn::Base64: !Sub |
           #!/bin/bash
-          sudo apt-get
-          sudo apt install unzip
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+          sudo yum update -y
+          sudo yum install httpd -y
+          sudo yum install php -y
+          sudo systemctl start httpd
 
   MyEC2InstancePrivate:
     Type: "AWS::EC2::Instance"
     Properties:
       InstanceType: t2.micro
       KeyName: my-application-key
-      ImageId: ami-0e872aee57663ae2d
+      ImageId: ami-0dac2efb38d54a859
       NetworkInterfaces:
         - AssociatePublicIpAddress: false
           DeviceIndex: 0
           GroupSet:
             - !Ref DefaultSecurityGroup
           SubnetId: !Ref PrivateSubnetId
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo yum update -y
+          sudo yum install httpd -y
+          sudo yum install php -y
+          sudo systemctl start httpd
+
+  MyTargetGroup:
+    DependsOn: MyEC2InstancePublic
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: "MyTargetGroup"
+      Port: 80
+      Protocol: HTTP
+      Targets:
+        - Id: !GetAtt MyEC2InstancePublic.InstanceId
+          Port: 80
+      VpcId: !Ref VpcId
+
+  MyLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: MyLoadBalancer
+      Scheme: internet-facing
+      SecurityGroups:
+        - !Ref DefaultSecurityGroup
+      Subnets:
+        - !Ref PublicSubnetIdA
+        - !Ref PublicSubnetIdB
+      Type: application
+
+  Listener:
+    DependsOn:
+      - MyTargetGroup
+      - MyLoadBalancer
+    Type: "AWS::ElasticLoadBalancingV2::Listener"
+    Properties:
+      DefaultActions:
+        TargetGroupArn: !Ref MyTargetGroup
+        Type: forward
+      LoadBalancerArn: !Ref MyLoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+  LoadBalancerRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      AliasTarget:
+        DNSName: !GetAtt MyLoadBalancer.DNSName
+        HostedZoneId: !GetAtt MyLoadBalancer.CanonicalHostedZoneID
+      HostedZoneName: code-grinder.click.
+      Name: code-grinder.click
+      Type: A

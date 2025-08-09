@@ -1,123 +1,98 @@
 Parameters:
+  StackName:
+    Type: String
+    Description: "Main Stack Name"
+  S3BucketName:
+    Type: String
+    Description: "Cloud Foramation S3 Bucket"
+    Default: bucket-with-stacks
+  VpcName:
+    Type: String
+    Description: "VPC Name"
   ClusterName:
     Type: String
     Description: AWS EKS Cluster Name
+  CreateNetworkStack:
+    Type: String
+    Default: false
+    Description: It determines if Network stack should be created
+    AllowedValues: [true, false]
+  CreateEC2Stack:
+    Type: String
+    Default: false
+    Description: It determines if EC2 stack should be created
+    AllowedValues: [true, false]
+  CreateEKSStack:
+    Type: String
+    Default: false
+    Description: It determines if EKS stack should be created
+    AllowedValues: [true, false]
+
+Conditions:
+  IsNetworkStackNeeded: !Equals
+    - !Ref CreateNetworkStack
+    - true
+  IsEC2StackNeeded: !Equals
+    - !Ref CreateEC2Stack
+    - true
+  IsEKSStackNeeded: !Equals
+    - !Ref CreateEKSStack
+    - true
 
 Resources:
+
   NetworkStack:
+    Condition: IsNetworkStackNeeded
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
-        ClusterName: !Ref ClusterName
+        VpcName: !Ref VpcName
       TimeoutInMinutes: 10
-      TemplateURL: https://bucket-with-stacks.s3.eu-central-1.amazonaws.com/network-template.yml
+      TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/network-template.yml"]]
 
-  #  EC2Stack:
-  #    Type: AWS::CloudFormation::Stack
-  #    DependsOn: NetworkStack
-  #    Properties:
-  #      Parameters:
-  #        PublicSubnetId: !GetAtt NetworkStack.Outputs.PublicSubnetA
-  #        PrivateSubnetId: !GetAtt NetworkStack.Outputs.PrivateSubnetX
-  #        DefaultSecurityGroup: !GetAtt NetworkStack.Outputs.DefaultSecurityGroup
-  #      TimeoutInMinutes: 10
-  #      TemplateURL: https://bucket-with-stacks.s3.eu-central-1.amazonaws.com/ec2-template.yml
-
-  EksClusterRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: EksClusterRole
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - eks.amazonaws.com
-            Action:
-              - sts:AssumeRole
-      ManagedPolicyArns: [arn:aws:iam::aws:policy/AmazonEKSClusterPolicy]
-
-  EksNodesRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: EksNodesRole
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: ec2.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
-        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
-        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
-
-  EKSCluster:
-    Type: AWS::EKS::Cluster
-    DependsOn: [NetworkStack, EksClusterRole]
-    Properties:
-      Name: !Ref ClusterName
-      RoleArn: !GetAtt EksClusterRole.Arn
-      ResourcesVpcConfig:
-        EndpointPrivateAccess: false
-        EndpointPublicAccess: true
-        SecurityGroupIds:
-          - !GetAtt NetworkStack.Outputs.DefaultSecurityGroup
-        SubnetIds:
-          - !GetAtt NetworkStack.Outputs.PublicSubnetA
-          - !GetAtt NetworkStack.Outputs.PublicSubnetB
-          - !GetAtt NetworkStack.Outputs.PublicSubnetC
-          - !GetAtt NetworkStack.Outputs.PrivateSubnetX
-          - !GetAtt NetworkStack.Outputs.PrivateSubnetY
-          - !GetAtt NetworkStack.Outputs.PrivateSubnetZ
-
-  NodeGroup:
-    Type: AWS::EKS::Nodegroup
-    DependsOn: [EKSCluster]
-    Properties:
-      ClusterName: !Ref EKSCluster
-      NodegroupName: EksNodeGroup
-      NodeRole: !GetAtt EksNodesRole.Arn
-      Subnets:
-        - !GetAtt NetworkStack.Outputs.PrivateSubnetX
-        - !GetAtt NetworkStack.Outputs.PrivateSubnetY
-        - !GetAtt NetworkStack.Outputs.PrivateSubnetZ
-      ScalingConfig:
-        DesiredSize: 1
-        MinSize: 0
-        MaxSize: 2
-      InstanceTypes:
-        # - t2.micro
-        - t2.small
-
-  OidcProvider:
-    Type: "AWS::IAM::OIDCProvider"
-    DependsOn: EKSCluster
-    Properties:
-      ClientIdList:
-        - "*"
-        - "sts.amazonaws.com"
-      Url: !GetAtt EKSCluster.OpenIdConnectIssuerUrl
-
-  EksClusterRoles:
-    Type: "AWS::CloudFormation::Stack"
-    DependsOn: EKSCluster
+  EC2Stack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: NetworkStack
+    Condition: IsEC2StackNeeded
     Properties:
       Parameters:
-        EKSClusterEndpoint: !GetAtt EKSCluster.Endpoint
+        StackName: !Ref StackName
+        VpcId: !GetAtt NetworkStack.Outputs.ClusterVPC
+        PublicSubnetIdA: !GetAtt NetworkStack.Outputs.PublicSubnetA
+        PublicSubnetIdB: !GetAtt NetworkStack.Outputs.PublicSubnetB
+        PrivateSubnetId: !GetAtt NetworkStack.Outputs.PrivateSubnetX
+        DefaultSecurityGroup: !GetAtt NetworkStack.Outputs.DefaultSecurityGroup
       TimeoutInMinutes: 10
-      TemplateURL: https://bucket-with-stacks.s3.eu-central-1.amazonaws.com/eks-cluster-roles.yml
+      TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/ec2-template.yml"]] 
+
+  EKSStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: NetworkStack
+    Condition: IsEKSStackNeeded  
+    Properties:
+      Parameters:
+        StackName: !Ref StackName
+        ClusterName: !Ref ClusterName
+        DefaultSecurityGroup: !GetAtt NetworkStack.Outputs.DefaultSecurityGroup
+        PublicSubnetA: !GetAtt NetworkStack.Outputs.PublicSubnetA
+        PublicSubnetB: !GetAtt NetworkStack.Outputs.PublicSubnetB
+        PublicSubnetC: !GetAtt NetworkStack.Outputs.PublicSubnetC
+        PrivateSubnetX: !GetAtt NetworkStack.Outputs.PrivateSubnetX
+        PrivateSubnetY: !GetAtt NetworkStack.Outputs.PrivateSubnetY
+        PrivateSubnetZ: !GetAtt NetworkStack.Outputs.PrivateSubnetZ
+      TimeoutInMinutes: 10
+      TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/eks.yml"]] 
 
 Outputs:
   ApplicationEksClusterVpc:
+    Condition: IsNetworkStackNeeded
     Description: VPC
     Value: !GetAtt NetworkStack.Outputs.ClusterVPC
     Export:
       Name: ApplicationEksClusterVpc
-  LoadBalancerControllerRole:
+  LoadBalancerControllerRoleArn:
+    Condition: IsEKSStackNeeded
     Description: AwsLoadBalancerControllerRole
-    Value: !GetAtt EksClusterRoles.Outputs.AwsLoadBalancerControllerRole
+    Value: !GetAtt EKSStack.Outputs.LoadBalancerControllerRole
     Export:
-      Name: LoadBalancerControllerRole
+      Name: LoadBalancerControllerRoleArn

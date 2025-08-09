@@ -2,12 +2,15 @@ Parameters:
     EKSClusterEndpoint:
         Type: String
         Description: EKS Cluster Endpoint
+    StackName:
+        Type: String
+        Description: "Main Stack Name"
 
 Resources:
     AwsLoadBalancerControllerRole:
         Type: AWS::IAM::Role
         Properties:
-            RoleName: AmazonEKSLoadBalancerControllerRole
+            RoleName: !Join [ '-', [ !Ref "AWS::Region", !Ref StackName, "LBCRole"] ]
             AssumeRolePolicyDocument: !Sub
                 - |
                     {

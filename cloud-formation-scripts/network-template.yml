@@ -1,7 +1,7 @@
 Parameters:
-    ClusterName:
+    VpcName:
         Type: String
-        Description: AWS EKS Cluster Name
+        Description: VPC Name
 
 Resources:
   ClusterVPC:
@@ -12,7 +12,7 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: !Join [" ", ["VPC for", !Ref ClusterName]]
+          Value: !Join [" ", ["VPC for", !Ref VpcName]]
 
   PublicSubnetA:
     Type: AWS::EC2::Subnet
@@ -221,6 +221,10 @@ Resources:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
           CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - IpProtocol: -1

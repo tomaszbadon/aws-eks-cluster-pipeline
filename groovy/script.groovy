@@ -6,9 +6,9 @@ def s3BucketExist() {
 def createS3Bucket() {
     def command = """aws s3api create-bucket \
             --bucket $S3_BUCKET_NAME \
-            --region $AWS_DEFAULT_REGION \
+            --region $params.AWS_REGION \
             --create-bucket-configuration \
-            LocationConstraint=$AWS_DEFAULT_REGION"""
+            LocationConstraint=$params.AWS_REGION"""
     def status = sh(script: command, returnStatus: true) == 0 ? 'true' : 'false'
     echo "The S3 Bucket: ${S3_BUCKET_NAME} created with status: ${status}"
 }
@@ -25,16 +25,16 @@ def awsLoadBalancerControllerExists() {
     env.AWS_LOAD_BALANCER_CONTROLLER_EXISTS = status == 0 ? 'true' : 'false'
 }
 
-def fetchVpcIdAndLoadBalancerControllerRole() {
+def fetchVpcIdAndLoadBalancerControllerRole(stackName) {
     def vpcId = sh(script: """aws cloudformation describe-stacks \
-        --stack-name eks-application-cluster \
+        --stack-name $stackName \
         --query 'Stacks[0].Outputs[?OutputKey==`ApplicationEksClusterVpc`].OutputValue' \
         --output text""", returnStdout: true).trim()
     echo "vpcId: ${vpcId}"
 
     def loadBalancerControllerRole = sh(script: """aws cloudformation describe-stacks \
-        --stack-name eks-application-cluster \
-        --query 'Stacks[0].Outputs[?OutputKey==`LoadBalancerControllerRole`].OutputValue' \
+        --stack-name $stackName \
+        --query 'Stacks[0].Outputs[?OutputKey==`LoadBalancerControllerRoleArn`].OutputValue' \
         --output text""", returnStdout: true).trim()
     echo "LoadBalancerControllerRole: ${loadBalancerControllerRole}"
 
@@ -60,7 +60,7 @@ def installAwsLoadBalancerController() {
         -n kube-system --set clusterName=$EKS_CLUSTER_NAME \
         --set serviceAccount.create=false \
         --set serviceAccount.name=aws-load-balancer-controller \
-        --set region=$AWS_DEFAULT_REGION \
+        --set region=$params.AWS_REGION \
         --set vpcId=${env.VPC_ID}""")
 }
 
