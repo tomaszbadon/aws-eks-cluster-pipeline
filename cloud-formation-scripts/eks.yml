@@ -94,7 +94,7 @@ Resources:
         MinSize: 0
         MaxSize: 2
       InstanceTypes:
-        - t2.small
+        - m6g.large
 
   OidcProvider:
     Type: "AWS::IAM::OIDCProvider"
