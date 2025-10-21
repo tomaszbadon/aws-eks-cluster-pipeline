@@ -1,0 +1,49 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micro-service-deployment
+  namespace: micro-service
+  labels:
+    app: micro-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: micro-service
+  template:
+    metadata:
+      labels:
+        app: micro-service
+    spec:
+      containers:
+      - name: micro-service
+        image: tomaszbadon/micro-service:0.0.1-SNAPSHOT
+        resources:
+          requests:
+            memory: "1024Mi"
+            cpu: "250m"
+          limits:
+            memory: "1536Mi"
+            cpu: "500m"  
+        ports:
+        - containerPort: 8080
+        env:
+          - name: JAVA_OPTS
+            value: "-Xmx512M" 
+        livenessProbe:
+          httpGet:
+              path: "/actuator/health/liveness"
+              port: 8080
+          initialDelaySeconds: 90
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+              path: "/actuator/health/readiness"
+              port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3        
