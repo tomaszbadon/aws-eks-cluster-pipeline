@@ -177,28 +177,32 @@ pipeline {
         }
 
         stage('Deploy application to EKS Cluster') {
-            container('awscli') {
-                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                    script {
-                                sh 'kubectl apply -f ./k8s/ns.yaml'
-                                sh 'kubectl apply -f ./k8s/micro-service-deployment.yaml'
-                                sh 'kubectl apply -f ./k8s/micro-service-service.yaml'
-                                sh 'kubectl apply -f ./k8s/ingress.yaml'
-                            }
+            steps{
+                container('awscli') {
+                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        script {
+                                    sh 'kubectl apply -f ./k8s/ns.yaml'
+                                    sh 'kubectl apply -f ./k8s/micro-service-deployment.yaml'
+                                    sh 'kubectl apply -f ./k8s/micro-service-service.yaml'
+                                    sh 'kubectl apply -f ./k8s/ingress.yaml'
+                                }
+                    }
                 }
             }
         }
 
         stage('Check Status of Application Load Balancer') {
-            container('awscli') {
-                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                                script {
-                                    sh """
-                                    aws elbv2 describe-load-balancers \
-                                    --query 'LoadBalancers[?VpcId==`$VPC_ID`].[DNSName]' \
-                                    --output text
-                                    """
-                                }
+            steps {
+                container('awscli') {
+                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                                    script {
+                                        sh """
+                                        aws elbv2 describe-load-balancers \
+                                        --query 'LoadBalancers[?VpcId==`$VPC_ID`].[DNSName]' \
+                                        --output text
+                                        """
+                                    }
+                    }
                 }
             }
         }
