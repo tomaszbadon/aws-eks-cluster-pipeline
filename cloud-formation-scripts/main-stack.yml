@@ -80,7 +80,7 @@ Resources:
         PrivateSubnetX: !GetAtt NetworkStack.Outputs.PrivateSubnetX
         PrivateSubnetY: !GetAtt NetworkStack.Outputs.PrivateSubnetY
         PrivateSubnetZ: !GetAtt NetworkStack.Outputs.PrivateSubnetZ
-      TimeoutInMinutes: 10
+      TimeoutInMinutes: 20
       TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/eks.yml"]] 
 
 Outputs:
