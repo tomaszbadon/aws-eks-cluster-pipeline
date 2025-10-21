@@ -177,10 +177,10 @@ pipeline {
                     container('awscli') {
                             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                                 script {
-                                    sh 'kubectl apply -f ns.yaml'
-                                    sh 'kubectl apply -f micro-service-deployment.yaml'
-                                    sh 'kubectl apply -f micro-service-service.yaml'
-                                    sh 'kubectl apply -f ingress.yaml'
+                                    sh 'kubectl apply -f ./k8s/ns.yaml'
+                                    sh 'kubectl apply -f ./k8s/micro-service-deployment.yaml'
+                                    sh 'kubectl apply -f ./k8s/micro-service-service.yaml'
+                                    sh 'kubectl apply -f ./k8s/ingress.yaml'
                                 }
                             }
                     }
