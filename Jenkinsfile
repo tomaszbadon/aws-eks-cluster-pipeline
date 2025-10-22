@@ -197,6 +197,13 @@ pipeline {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         script {
                             gv.fetchDNSNameAndHostedZoneId();
+                            sh """
+                            aws cloudformation deploy \
+                                --template-file ./cloud-formation-scripts/micro-service-route53.yaml \
+                                --stack-name ${params.STACK_NAME}-route53 \
+                                --region $params.AWS_REGION \
+                                --parameter-overrides DNSName=$DNS_NAME HostedZoneId=$CANONICAL_HOSTED_ZONE_ID
+                            """
                         }
                     }
                 }
