@@ -64,4 +64,22 @@ def installAwsLoadBalancerController() {
         --set vpcId=${env.VPC_ID}""")
 }
 
+def fetchDNSNameAndHostedZoneId() {
+    def dnsName = sh(script: """
+        aws elbv2 describe-load-balancers \
+        --query 'LoadBalancers[?VpcId==`$VPC_ID`].[DNSName]' \
+        --output text
+        """, returnStdout: true).trim()
+    echo "dnsName: ${vpcId}"
+
+    def canonicalHostedZoneId = sh(script: """
+        aws elbv2 describe-load-balancers \
+        --query 'LoadBalancers[?VpcId==`$VPC_ID`].[CanonicalHostedZoneId]' \
+        --output text
+        """, returnStdout: true).trim()
+    echo "canonicalHostedZoneId: ${canonicalHostedZoneId}"
+
+    env.CANONICAL_HOSTED_ZONE_ID = canonicalHostedZoneId
+}
+
 return this
