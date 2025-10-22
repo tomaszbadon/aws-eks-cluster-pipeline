@@ -70,7 +70,7 @@ def fetchDNSNameAndHostedZoneId() {
         --query 'LoadBalancers[?VpcId==`$VPC_ID`].[DNSName]' \
         --output text
         """, returnStdout: true).trim()
-    echo "dnsName: ${vpcId}"
+    echo "dnsName: ${dnsName}"
 
     def canonicalHostedZoneId = sh(script: """
         aws elbv2 describe-load-balancers \
