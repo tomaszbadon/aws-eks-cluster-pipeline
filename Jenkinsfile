@@ -177,6 +177,11 @@ pipeline {
         }
 
         stage('Deploy application to EKS Cluster') {
+            when {
+                expression {
+                    params.CREATE_EKS_INFRASTRUCTURE == true
+                }
+            }
             steps{
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
@@ -189,13 +194,18 @@ pipeline {
                                     sh 'sleep 10'
                                     sh 'kubectl apply -f ./k8s/ingress.yaml'
                                     sh 'sleep 10'
-                                }
+                        }
                     }
                 }
             }
         }
 
         stage('Deploy Hosted Zone') {
+            when {
+                expression {
+                    params.CREATE_EKS_INFRASTRUCTURE == true
+                }
+            }
             steps {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
