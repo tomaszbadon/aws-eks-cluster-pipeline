@@ -182,9 +182,13 @@ pipeline {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         script {
                                     sh 'kubectl apply -f ./k8s/ns.yaml'
+                                    sh 'sleep 10'
                                     sh 'kubectl apply -f ./k8s/micro-service-deployment.yaml'
+                                    sh 'sleep 10'
                                     sh 'kubectl apply -f ./k8s/micro-service-service.yaml'
+                                    sh 'sleep 10'
                                     sh 'kubectl apply -f ./k8s/ingress.yaml'
+                                    sh 'sleep 10'
                                 }
                     }
                 }
