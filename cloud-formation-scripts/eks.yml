@@ -124,5 +124,6 @@ Outputs:
   EKSClusterEndpoint:
     Description: EKS Cluster Endpoint
     Value: !GetAtt EKSCluster.Endpoint
+    Export:  
       Name: EKSClusterEndpoint
   
