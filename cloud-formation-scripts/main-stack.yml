@@ -89,7 +89,7 @@ Resources:
     DependsOn: EKSStack
     Properties:
       Parameters:
-        EKSClusterEndpoint: !GetAtt EKSStack.EKSClusterEndpoint
+        EKSClusterEndpoint: !GetAtt EKSStack.Outputs.EKSClusterEndpoint
       TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/web-service-dependencies.yml"]]
 
 Outputs:
