@@ -87,7 +87,8 @@ Resources:
     Condition: IsEKSStackNeeded 
     Type: AWS::CloudFormation::Stack
     DependsOn: EKSStack
-    TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/web-service-dependencies.yml"]]
+    Properties:
+      TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/web-service-dependencies.yml"]]
 
 Outputs:
   ApplicationEksClusterVpc:
