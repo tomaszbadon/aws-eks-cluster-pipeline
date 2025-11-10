@@ -127,8 +127,8 @@ Resources:
                               ],
                           ],
                       ]
-            Namespace: micro-service-sa
-            ServiceAccount: micro-service
+            Namespace: micro-service
+            ServiceAccount: micro-service-sa
 
   S3BucketAccessPolicy:
     Type: AWS::IAM::Policy
