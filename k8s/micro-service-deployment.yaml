@@ -5,7 +5,7 @@ metadata:
   name: micro-service-sa
   namespace: micro-service
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::141643165132:role/AccessToS3BucketRole
+    eks.amazonaws.com/role-arn: arn:aws:iam::141643165132:role/eu-central-1-eks-application-cluster-S3BucketAccessRole
 
 ---
 
