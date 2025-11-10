@@ -83,6 +83,7 @@ pipeline {
                             gv.uploadFileToS3Bucket('eks-cluster-roles.yml')
                             gv.uploadFileToS3Bucket('ec2-template.yml')
                             gv.uploadFileToS3Bucket('eks.yml')
+                            gv.uploadFileToS3Bucket('web-service-dependencies.yml')
                         }
                     }
                 }
