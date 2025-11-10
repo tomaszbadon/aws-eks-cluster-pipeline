@@ -7,7 +7,7 @@ metadata:
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::141643165132:role/AccessToS3BucketRole
 
----:q
+---
 
 apiVersion: apps/v1
 kind: Deployment
