@@ -132,6 +132,7 @@ Resources:
 
   S3BucketAccessPolicy:
     Type: AWS::IAM::Policy
+    DependsOn: S3BucketAccessRole
     Properties:
       Roles:
         - S3BucketAccessRole
