@@ -49,7 +49,7 @@ Resources:
     DependsOn: S3BucketAccessRole
     Properties:
       Roles:
-        - S3BucketAccessRole
+        - !Ref S3BucketAccessRole
       PolicyName: !Join [ '-', [ !Ref "AWS::Region", !Ref StackName, "S3BucketAccessPolicy"] ]
       PolicyDocument: |
         {
