@@ -25,7 +25,7 @@ pipeline {
         string(name: 'STACK_NAME', defaultValue: 'eks-application-cluster', description: 'Cloud Formation Stack Name')
         booleanParam(name: 'CREATE_NETWORK_INFRASTRUCTURE', defaultValue: true, description: 'Create Network Infrastructure')
         booleanParam(name: 'CREATE_EC2_INFRASTRUCTURE', defaultValue: false, description: 'Create EC2 Infrastructure and Web Server')
-        booleanParam(name: 'CREATE_EKS_INFRASTRUCTURE', defaultValue: false, description: 'Create EKS Infrastructure')
+        booleanParam(name: 'CREATE_EKS_INFRASTRUCTURE', defaultValue: true, description: 'Create EKS Infrastructure')
         choice(name: 'AWS_REGION', choices: ['eu-central-1'], description: 'AWS Region') 
     }
 

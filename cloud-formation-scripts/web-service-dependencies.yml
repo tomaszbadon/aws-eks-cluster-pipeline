@@ -1,4 +1,8 @@
 
+Parameters:
+    EKSClusterEndpoint:
+        Type: String
+        Description: EKS Cluster Endpoint
 Resources:
   S3BucketAccessPolicy:
   Type: AWS::IAM::Policy

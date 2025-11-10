@@ -84,10 +84,12 @@ Resources:
       TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/eks.yml"]] 
 
   WebServiceDependencies:
-    Condition: IsEKSStackNeeded 
     Type: AWS::CloudFormation::Stack
+    Condition: IsEKSStackNeeded 
     DependsOn: EKSStack
     Properties:
+      Parameters:
+        EKSClusterEndpoint: !GetAtt EKSStack.EKSClusterEndpoint
       TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/web-service-dependencies.yml"]]
 
 Outputs:
