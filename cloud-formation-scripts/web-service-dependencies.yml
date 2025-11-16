@@ -11,7 +11,7 @@ Resources:
   S3BucketAccessRole:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: !Join [ '-', [ !Ref "AWS::Region", !Ref StackName, "S3BucketAccessRole"] ]
+        RoleName: S3BucketAccessRole-TEMP
         AssumeRolePolicyDocument: !Sub
           - |
                     {
@@ -50,7 +50,7 @@ Resources:
     Properties:
       Roles:
         - !Ref S3BucketAccessRole
-      PolicyName: !Join [ '-', [ !Ref "AWS::Region", !Ref StackName, "S3BucketAccessPolicy"] ]
+      PolicyName: S3BucketAccessPolicy-TEMP
       PolicyDocument: |
         {
         "Version": "2012-10-17",
