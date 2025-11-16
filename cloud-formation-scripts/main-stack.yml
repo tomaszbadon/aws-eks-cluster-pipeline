@@ -83,94 +83,15 @@ Resources:
       TimeoutInMinutes: 20
       TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/eks.yml"]] 
 
-  # WebServiceDependencies:
-  #   Type: AWS::CloudFormation::Stack
-  #   Condition: IsEKSStackNeeded 
-  #   DependsOn: EKSStack
-  #   Properties:
-  #     Parameters:
-  #       EKSClusterEndpoint: !GetAtt EKSStack.Outputs.EKSClusterEndpoint
-  #       StackName: !Ref StackName
-  #     TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/web-service-dependencies.yml"]]
-
-  S3BucketAccessRole:
-      Type: AWS::IAM::Role
-      DependsOn: EKSStack
-      Properties:
-        RoleName: !Join [ '-', [ !Ref "AWS::Region", !Ref StackName, "S3BucketAccessRole"] ]
-        AssumeRolePolicyDocument: !Sub
-          - |
-                    {
-                      "Version": "2012-10-17",
-                      "Statement": [
-                        {
-                          "Effect": "Allow",
-                          "Principal": {
-                            "Federated": "arn:aws:iam::${AWS::AccountId}:oidc-provider/oidc.eks.${AWS::Region}.amazonaws.com/id/${Id}"
-                          },
-                          "Action": "sts:AssumeRoleWithWebIdentity",
-                          "Condition": {
-                            "StringEquals": {
-                              "oidc.eks.${AWS::Region}.amazonaws.com/id/${Id}:sub": "system:serviceaccount:${Namespace}:${ServiceAccount}"                            }
-                          }
-                        }
-                      ]
-                    }
-          - Id:
-                      !Select [
-                          0,
-                          !Split [
-                              ".",
-                              !Select [
-                                  1,
-                                  !Split ["://", !GetAtt EKSStack.Outputs.EKSClusterEndpoint],
-                              ],
-                          ],
-                      ]
-            Namespace: micro-service
-            ServiceAccount: micro-service-sa
-
-  S3BucketAccessPolicy:
-    Type: AWS::IAM::Policy
-    DependsOn: S3BucketAccessRole
+  WebServiceDependencies:
+    Type: AWS::CloudFormation::Stack
+    Condition: IsEKSStackNeeded 
+    DependsOn: EKSStack
     Properties:
-      Roles:
-        - !Ref S3BucketAccessRole
-      PolicyName: !Join [ '-', [ !Ref "AWS::Region", !Ref StackName, "S3BucketAccessPolicy"] ]
-      PolicyDocument: |
-        {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Sid": "VisualEditor0",
-                "Effect": "Allow",
-                "Action": [
-                    "s3:ListAccessPointsForObjectLambda",
-                    "s3:GetAccessPoint",
-                    "s3:PutAccountPublicAccessBlock",
-                    "s3:ListAccessPoints",
-                    "s3:CreateStorageLensGroup",
-                    "s3:ListJobs",
-                    "s3:PutStorageLensConfiguration",
-                    "s3:ListMultiRegionAccessPoints",
-                    "s3:ListStorageLensGroups",
-                    "s3:ListStorageLensConfigurations",
-                    "s3:GetAccountPublicAccessBlock",
-                    "s3:ListAllMyBuckets",
-                    "s3:ListAccessGrantsInstances",
-                    "s3:PutAccessPointPublicAccessBlock",
-                    "s3:CreateJob"
-                ],
-                "Resource": "*"
-            },
-            {
-                "Sid": "VisualEditor1",
-                "Effect": "Allow",
-                "Action": "s3:*",
-                "Resource": "arn:aws:s3:::bucket-with-stacks"
-            }
-          ]
-        }
+      Parameters:
+        EKSClusterEndpoint: !GetAtt EKSStack.Outputs.EKSClusterEndpoint
+        StackName: !Ref StackName
+      TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/web-service-dependencies.yml"]]
 
 Outputs:
   ApplicationEksClusterVpc:
