@@ -83,15 +83,15 @@ Resources:
       TimeoutInMinutes: 20
       TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/eks.yml"]] 
 
-  # WebServiceDependencies:
-  #   Type: AWS::CloudFormation::Stack
-  #   Condition: IsEKSStackNeeded 
-  #   DependsOn: EKSStack
-  #   Properties:
-  #     Parameters:
-  #       EKSClusterEndpoint: !GetAtt EKSStack.Outputs.EKSClusterEndpoint
-  #       StackName: !Ref StackName
-  #     TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/web-service-dependencies.yml"]]
+  WebServiceDependencies:
+    Type: AWS::CloudFormation::Stack
+    Condition: IsEKSStackNeeded 
+    DependsOn: EKSStack
+    Properties:
+      Parameters:
+        EKSClusterEndpoint: !GetAtt EKSStack.Outputs.EKSClusterEndpoint
+        StackName: !Ref StackName
+      TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/web-service-dependencies.yml"]]
 
 Outputs:
   ApplicationEksClusterVpc:
