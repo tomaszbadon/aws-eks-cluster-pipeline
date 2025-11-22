@@ -51,6 +51,13 @@ def deployAwsLoadBalancerServiceAccount() {
     sh(script:'kubectl apply -f ./k8s/aws-load-balancer-controller-service-account.yml')
 }
 
+def replaceToken(filePath, token, value) {
+    def fileContent = readFile(filePath)
+    fileContent = fileContent.replace(token, value)
+    writeFile file: filePath, text: "${fileContent}"
+    echo fileContent
+}
+
 def installAwsLoadBalancerController() {
     sh(script: 'helm repo add eks https://aws.github.io/eks-charts')
 
@@ -62,6 +69,36 @@ def installAwsLoadBalancerController() {
         --set serviceAccount.name=aws-load-balancer-controller \
         --set region=$params.AWS_REGION \
         --set vpcId=${env.VPC_ID}""")
+}
+
+def fetchS3BucketAccessRoleArn(stackName) {
+    def s3BucketAccessRole = sh(script: """aws cloudformation describe-stacks \
+        --stack-name $stackName \
+        --query 'Stacks[0].Outputs[?OutputKey==`S3BucketAccessRoleArn`].OutputValue' \
+        --output text""", returnStdout: true).trim()
+    echo "S3BucketAccessRoleArn: ${s3BucketAccessRole}"
+
+    env.S3_BUCKET_ACCESS_ROLE = s3BucketAccessRole
+}
+
+def fetchDNSNameAndHostedZoneId() {
+    def dnsName = sh(script: """
+        aws elbv2 describe-load-balancers \
+        --query 'LoadBalancers[?VpcId==`$VPC_ID`].[DNSName]' \
+        --output text
+        """, returnStdout: true).trim()
+
+    echo "dnsName: ${dnsName}"
+    env.DNS_NAME = dnsName
+
+    def canonicalHostedZoneId = sh(script: """
+        aws elbv2 describe-load-balancers \
+        --query 'LoadBalancers[?VpcId==`$VPC_ID`].[CanonicalHostedZoneId]' \
+        --output text
+        """, returnStdout: true).trim()
+        
+    echo "canonicalHostedZoneId: ${canonicalHostedZoneId}"
+    env.CANONICAL_HOSTED_ZONE_ID = canonicalHostedZoneId
 }
 
 return this

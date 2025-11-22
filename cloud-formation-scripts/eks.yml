@@ -121,3 +121,9 @@ Outputs:
     Value: !GetAtt EksClusterRoles.Outputs.AwsLoadBalancerControllerRole
     Export:
       Name: LoadBalancerControllerRole
+  EKSClusterEndpoint:
+    Description: EKS Cluster Endpoint
+    Value: !GetAtt EKSCluster.Endpoint
+    Export:  
+      Name: EKSClusterEndpoint
+  

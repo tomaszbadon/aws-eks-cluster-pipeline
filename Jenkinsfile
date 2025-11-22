@@ -25,7 +25,7 @@ pipeline {
         string(name: 'STACK_NAME', defaultValue: 'eks-application-cluster', description: 'Cloud Formation Stack Name')
         booleanParam(name: 'CREATE_NETWORK_INFRASTRUCTURE', defaultValue: true, description: 'Create Network Infrastructure')
         booleanParam(name: 'CREATE_EC2_INFRASTRUCTURE', defaultValue: false, description: 'Create EC2 Infrastructure and Web Server')
-        booleanParam(name: 'CREATE_EKS_INFRASTRUCTURE', defaultValue: false, description: 'Create EKS Infrastructure')
+        booleanParam(name: 'CREATE_EKS_INFRASTRUCTURE', defaultValue: true, description: 'Create EKS Infrastructure')
         choice(name: 'AWS_REGION', choices: ['eu-central-1'], description: 'AWS Region') 
     }
 
@@ -83,6 +83,7 @@ pipeline {
                             gv.uploadFileToS3Bucket('eks-cluster-roles.yml')
                             gv.uploadFileToS3Bucket('ec2-template.yml')
                             gv.uploadFileToS3Bucket('eks.yml')
+                            gv.uploadFileToS3Bucket('web-service-dependencies.yml')
                         }
                     }
                 }
@@ -172,7 +173,59 @@ pipeline {
                         }
                     }
                 }
+
             }
         }
+
+        stage('Deploy application to EKS Cluster') {
+            when {
+                expression {
+                    params.CREATE_EKS_INFRASTRUCTURE == true
+                }
+            }
+            steps{
+                container('awscli') {
+                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        script {
+                                    gv.fetchS3BucketAccessRoleArn(params.STACK_NAME);
+                                    gv.replaceToken('./k8s/micro-service-deployment.yaml', '{{S3_BUCKET_ACCESS_ROLE_ARN}}', env.S3_BUCKET_ACCESS_ROLE);
+                                    sh 'kubectl apply -f ./k8s/ns.yaml'
+                                    sh 'sleep 10'
+                                    sh 'kubectl apply -f ./k8s/micro-service-deployment.yaml'
+                                    sh 'sleep 10'
+                                    sh 'kubectl apply -f ./k8s/micro-service-service.yaml'
+                                    sh 'sleep 10'
+                                    sh 'kubectl apply -f ./k8s/ingress.yaml'
+                                    sh 'sleep 10'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Hosted Zone') {
+            when {
+                expression {
+                    params.CREATE_EKS_INFRASTRUCTURE == true
+                }
+            }
+            steps {
+                container('awscli') {
+                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        script {
+                            gv.fetchDNSNameAndHostedZoneId();
+                            sh """
+                            aws cloudformation deploy \
+                                --template-file ./cloud-formation-scripts/micro-service-route53.yaml \
+                                --stack-name ${params.STACK_NAME}-route53 \
+                                --region $params.AWS_REGION \
+                                --parameter-overrides DNSName=$DNS_NAME HostedZoneId=$CANONICAL_HOSTED_ZONE_ID
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }

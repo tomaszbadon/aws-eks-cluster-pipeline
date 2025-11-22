@@ -1,0 +1,17 @@
+Parameters:
+  DNSName:
+    Type: String
+    Description: DNSName
+  HostedZoneId:
+    Type: String
+    Description: HostedZoneId
+Resources:
+  LoadBalancerRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      AliasTarget:
+          DNSName: !Ref DNSName
+          HostedZoneId: !Ref HostedZoneId
+      HostedZoneName: code-grinder.click.
+      Name: service.code-grinder.click
+      Type: A

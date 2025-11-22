@@ -62,7 +62,7 @@ Resources:
         PublicSubnetIdB: !GetAtt NetworkStack.Outputs.PublicSubnetB
         PrivateSubnetId: !GetAtt NetworkStack.Outputs.PrivateSubnetX
         DefaultSecurityGroup: !GetAtt NetworkStack.Outputs.DefaultSecurityGroup
-      TimeoutInMinutes: 10
+      TimeoutInMinutes: 20
       TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/ec2-template.yml"]] 
 
   EKSStack:
@@ -80,8 +80,18 @@ Resources:
         PrivateSubnetX: !GetAtt NetworkStack.Outputs.PrivateSubnetX
         PrivateSubnetY: !GetAtt NetworkStack.Outputs.PrivateSubnetY
         PrivateSubnetZ: !GetAtt NetworkStack.Outputs.PrivateSubnetZ
-      TimeoutInMinutes: 10
+      TimeoutInMinutes: 20
       TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/eks.yml"]] 
+
+  WebServiceDependencies:
+    Type: AWS::CloudFormation::Stack
+    Condition: IsEKSStackNeeded 
+    DependsOn: EKSStack
+    Properties:
+      Parameters:
+        EKSClusterEndpoint: !GetAtt EKSStack.Outputs.EKSClusterEndpoint
+        StackName: !Ref StackName
+      TemplateURL: !Join ["", ["https://", !Ref S3BucketName, ".s3.", !Ref "AWS::Region", ".amazonaws.com/web-service-dependencies.yml"]]
 
 Outputs:
   ApplicationEksClusterVpc:
@@ -96,3 +106,9 @@ Outputs:
     Value: !GetAtt EKSStack.Outputs.LoadBalancerControllerRole
     Export:
       Name: LoadBalancerControllerRoleArn
+  S3BucketAccessRoleArn:
+    Condition: IsEKSStackNeeded
+    Description: S3BucketAccessRole
+    Value: !GetAtt WebServiceDependencies.Outputs.S3BucketAccessRole
+    Export:
+      Name: S3BucketAccessRoleArn

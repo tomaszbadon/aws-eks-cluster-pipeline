@@ -1,0 +1,94 @@
+
+Parameters:
+  EKSClusterEndpoint:
+    Type: String
+    Description: EKS Cluster Endpoint
+  StackName:
+    Type: String
+    Description: EKS Stack Name
+
+Resources:
+  S3BucketAccessRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: !Join [ '-', ["S3BucketAccessRole", !Ref StackName,!Ref "AWS::Region"]]
+        AssumeRolePolicyDocument: !Sub
+          - |
+                    {
+                      "Version": "2012-10-17",
+                      "Statement": [
+                        {
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Federated": "arn:aws:iam::${AWS::AccountId}:oidc-provider/oidc.eks.${AWS::Region}.amazonaws.com/id/${Id}"
+                          },
+                          "Action": "sts:AssumeRoleWithWebIdentity",
+                          "Condition": {
+                            "StringEquals": {
+                              "oidc.eks.${AWS::Region}.amazonaws.com/id/${Id}:sub": "system:serviceaccount:${Namespace}:${ServiceAccount}"                            }
+                          }
+                        }
+                      ]
+                    }
+          - Id:
+                      !Select [
+                          0,
+                          !Split [
+                              ".",
+                              !Select [
+                                  1,
+                                  !Split ["://", !Ref EKSClusterEndpoint],
+                              ],
+                          ],
+                      ]
+            Namespace: micro-service
+            ServiceAccount: micro-service-sa
+
+  S3BucketAccessPolicy:
+    Type: AWS::IAM::Policy
+    DependsOn: S3BucketAccessRole
+    Properties:
+      Roles:
+        - !Ref S3BucketAccessRole
+      PolicyName: !Join [ '-', ["S3BucketAccessPolicy", !Ref StackName,!Ref "AWS::Region"]]
+      PolicyDocument: |
+        {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "VisualEditor0",
+                "Effect": "Allow",
+                "Action": [
+                    "s3:ListAccessPointsForObjectLambda",
+                    "s3:GetAccessPoint",
+                    "s3:PutAccountPublicAccessBlock",
+                    "s3:ListAccessPoints",
+                    "s3:CreateStorageLensGroup",
+                    "s3:ListJobs",
+                    "s3:PutStorageLensConfiguration",
+                    "s3:ListMultiRegionAccessPoints",
+                    "s3:ListStorageLensGroups",
+                    "s3:ListStorageLensConfigurations",
+                    "s3:GetAccountPublicAccessBlock",
+                    "s3:ListAllMyBuckets",
+                    "s3:ListAccessGrantsInstances",
+                    "s3:PutAccessPointPublicAccessBlock",
+                    "s3:CreateJob"
+                ],
+                "Resource": "*"
+            },
+            {
+                "Sid": "VisualEditor1",
+                "Effect": "Allow",
+                "Action": "s3:*",
+                "Resource": "arn:aws:s3:::bucket-with-stacks"
+            }
+          ]
+        }
+
+Outputs: 
+  S3BucketAccessRole:
+    Description: S3BucketAccessRole
+    Value: !GetAtt S3BucketAccessRole.Arn
+    Export:
+      Name: S3BucketAccessRole
