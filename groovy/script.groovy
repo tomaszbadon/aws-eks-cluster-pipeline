@@ -51,6 +51,13 @@ def deployAwsLoadBalancerServiceAccount() {
     sh(script:'kubectl apply -f ./k8s/aws-load-balancer-controller-service-account.yml')
 }
 
+def replaceToken(filePath, token, value) {
+    def fileContent = readFile(filePath)
+    fileContent = fileContent.replace(token, value)
+    writeFile file: filePath, text: "${fileContent}"
+    echo fileContent
+}
+
 def installAwsLoadBalancerController() {
     sh(script: 'helm repo add eks https://aws.github.io/eks-charts')
 
