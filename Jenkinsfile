@@ -187,6 +187,7 @@ pipeline {
                 container('awscli') {
                     withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         script {
+                                    gv.fetchS3BucketAccessRoleArn(params.STACK_NAME);
                                     sh 'kubectl apply -f ./k8s/ns.yaml'
                                     sh 'sleep 10'
                                     sh 'kubectl apply -f ./k8s/micro-service-deployment.yaml'

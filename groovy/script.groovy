@@ -64,6 +64,16 @@ def installAwsLoadBalancerController() {
         --set vpcId=${env.VPC_ID}""")
 }
 
+def fetchS3BucketAccessRoleArn(stackName) {
+    def s3BucketAccessRole = sh(script: """aws cloudformation describe-stacks \
+        --stack-name $stackName \
+        --query 'Stacks[0].Outputs[?OutputKey==`S3BucketAccessRoleArn`].OutputValue' \
+        --output text""", returnStdout: true).trim()
+    echo "S3BucketAccessRoleArn: ${s3BucketAccessRole}"
+
+    env.S3_BUCKET_ACCESS_ROLE = s3BucketAccessRole
+}
+
 def fetchDNSNameAndHostedZoneId() {
     def dnsName = sh(script: """
         aws elbv2 describe-load-balancers \
