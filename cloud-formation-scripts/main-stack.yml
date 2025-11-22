@@ -106,3 +106,9 @@ Outputs:
     Value: !GetAtt EKSStack.Outputs.LoadBalancerControllerRole
     Export:
       Name: LoadBalancerControllerRoleArn
+  S3BucketAccessRole:
+    Condition: IsEKSStackNeeded
+    Description: S3BucketAccessRole
+    Value: !GetAtt WebServiceDependencies.Outputs.S3BucketAccessRole
+    Export:
+      Name: S3BucketAccessRole
