@@ -85,3 +85,10 @@ Resources:
             }
           ]
         }
+
+Outputs: 
+  S3BucketAccessRole:
+    Description: S3BucketAccessRole
+    Value: !GetAtt S3BucketAccessRole.Arn
+    Export:
+      Name: S3BucketAccessRole
