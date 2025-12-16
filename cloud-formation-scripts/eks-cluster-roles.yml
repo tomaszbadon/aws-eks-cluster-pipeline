@@ -399,3 +399,8 @@ Outputs:
         Value: !GetAtt AwsLoadBalancerControllerRole.Arn
         Export:
             Name: AwsLoadBalancerControllerRole
+    ElasticFileSystemIAMRole:
+        Description: ElasticFileSystemIAMRole
+        Value: !GetAtt ElasticFileSystemIAMRole.Arn
+        Export:
+            Name: ElasticFileSystemIAMRole
