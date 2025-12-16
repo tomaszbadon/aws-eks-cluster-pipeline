@@ -42,6 +42,100 @@ Resources:
                       ]
                   Namespace: kube-system
                   ServiceAccount: aws-load-balancer-controller
+    
+    ElasticFileSystemIAMRole:
+        Type: AWS::IAM::Role
+        Properties:
+            RoleName: !Join [ '-', [ !Ref "AWS::Region", !Ref StackName, "ElasticFileSystemIAMRole"] ]
+            AssumeRolePolicyDocument: !Sub
+                - |
+                    {
+                      "Version": "2012-10-17",
+                      "Statement": [
+                        {
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Federated": "arn:aws:iam::${AWS::AccountId}:oidc-provider/oidc.eks.${AWS::Region}.amazonaws.com/id/${Id}"
+                          },
+                          "Action": "sts:AssumeRoleWithWebIdentity",
+                          "Condition": {
+                            "StringEquals": {
+                              "oidc.eks.${AWS::Region}.amazonaws.com/id/${Id}:sub": "system:serviceaccount:${Namespace}:${ServiceAccount}"                            }
+                          }
+                        }
+                      ]
+                    }
+                - Id:
+                      !Select [
+                          0,
+                          !Split [
+                              ".",
+                              !Select [
+                                  1,
+                                  !Split ["://", !Ref EKSClusterEndpoint],
+                              ],
+                          ],
+                      ]
+                  Namespace: kube-system
+                  ServiceAccount: efs-csi-controller-sa
+
+    ElasticFileSystemIAMPolicy:
+        Type: AWS::IAM::Policy
+        DependsOn: ElasticFileSystemIAMRole
+        Properties:
+            PolicyName: ElasticFileSystemIAMPolicy
+            Roles:
+                - !Ref ElasticFileSystemIAMRole
+            PolicyDocument: |
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                        "Effect": "Allow",
+                        "Action": [
+                            "elasticfilesystem:DescribeAccessPoints",
+                            "elasticfilesystem:DescribeFileSystems",
+                            "elasticfilesystem:DescribeMountTargets",
+                            "ec2:DescribeAvailabilityZones"
+                        ],
+                        "Resource": "*"
+                        },
+                        {
+                        "Effect": "Allow",
+                        "Action": [
+                            "elasticfilesystem:CreateAccessPoint"
+                        ],
+                        "Resource": "*",
+                        "Condition": {
+                            "StringLike": {
+                            "aws:RequestTag/efs.csi.aws.com/cluster": "true"
+                            }
+                        }
+                        },
+                        {
+                        "Effect": "Allow",
+                        "Action": [
+                            "elasticfilesystem:TagResource"
+                        ],
+                        "Resource": "*",
+                        "Condition": {
+                            "StringLike": {
+                            "aws:ResourceTag/efs.csi.aws.com/cluster": "true"
+                            }
+                        }
+                        },
+                        {
+                        "Effect": "Allow",
+                        "Action": "elasticfilesystem:DeleteAccessPoint",
+                        "Resource": "*",
+                        "Condition": {
+                            "StringEquals": {
+                            "aws:ResourceTag/efs.csi.aws.com/cluster": "true"
+                            }
+                        }
+                        }
+                    ]
+                }
 
     AWSLoadBalancerControllerIAMPolicy:
         Type: AWS::IAM::Policy
