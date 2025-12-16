@@ -112,3 +112,9 @@ Outputs:
     Value: !GetAtt WebServiceDependencies.Outputs.S3BucketAccessRole
     Export:
       Name: S3BucketAccessRoleArn
+  EFSFileSystemId:
+    Condition: IsEKSStackNeeded
+    Description: EFS File System ID
+    Value: !GetAtt EKSStack.Outputs.EFSFileSystemId
+    Export:
+      Name: EFSFileSystemId

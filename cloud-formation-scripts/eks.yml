@@ -136,4 +136,9 @@ Outputs:
     Value: !GetAtt EKSCluster.Endpoint
     Export:  
       Name: EKSClusterEndpoint
+  EFSFileSystemId:
+    Description: EFS File System ID
+    Value: !Ref EFSFileSystem
+    Export:
+      Name: EFSFileSystemId
   
