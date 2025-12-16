@@ -115,6 +115,16 @@ Resources:
       TimeoutInMinutes: 10
       TemplateURL: https://bucket-with-stacks.s3.eu-central-1.amazonaws.com/eks-cluster-roles.yml
 
+  EFSFileSystem:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      PerformanceMode: generalPurpose
+      Encrypted: true
+      ThroughputMode: bursting
+      FileSystemTags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-FileSystem"
+
 Outputs: 
   LoadBalancerControllerRole:
     Description: AwsLoadBalancerControllerRole
