@@ -117,4 +117,4 @@ Outputs:
     Description: EFS File System ID
     Value: !GetAtt EKSStack.Outputs.EFSFileSystemId
     Export:
-      Name: EFSFileSystemId
+      Name: FileSystemId
