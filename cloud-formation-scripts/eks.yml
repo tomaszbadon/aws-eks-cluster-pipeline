@@ -166,7 +166,7 @@ Outputs:
     Description: ElasticFileSystemIAMRole
     Value: !GetAtt EksClusterRoles.Outputs.ElasticFileSystemIAMRole
     Export:
-      Name: ElasticFileSystemIAMRole
+      Name: ElasticFileSystemIAMRoleArn
   EKSClusterEndpoint:
     Description: EKS Cluster Endpoint
     Value: !GetAtt EKSCluster.Endpoint

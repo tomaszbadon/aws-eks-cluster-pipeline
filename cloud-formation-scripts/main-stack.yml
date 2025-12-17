@@ -121,6 +121,6 @@ Outputs:
   ElasticFileSystemIAMRoleArn:
     Condition: IsEKSStackNeeded
     Description: ElasticFileSystemIAMRoleArn
-    Value: !GetAtt EKSStack.Outputs.ElasticFileSystemIAMRole
+    Value: !GetAtt EKSStack.Outputs.ElasticFileSystemIAMRoleArn
     Export:
       Name: EFSIAMRoleArn
