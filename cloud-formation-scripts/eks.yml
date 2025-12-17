@@ -126,6 +126,36 @@ Resources:
         - Key: Name
           Value: !Sub "${AWS::StackName}-FileSystem"
 
+  MountTargetX:
+    DependsOn:
+      - EFSFileSystem
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !Ref PrivateSubnetX
+      SecurityGroups:
+        - !Ref DefaultSecurityGroup
+    
+  MountTargetY:
+    DependsOn:
+      - EFSFileSystem
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !Ref PrivateSubnetY
+      SecurityGroups:
+        - !Ref DefaultSecurityGroup
+
+  MountTargetZ:
+    DependsOn:
+      - EFSFileSystem
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !Ref PrivateSubnetZ
+      SecurityGroups:
+        - !Ref DefaultSecurityGroup
+
 Outputs: 
   LoadBalancerControllerRole:
     Description: AwsLoadBalancerControllerRole
