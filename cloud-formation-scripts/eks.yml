@@ -162,7 +162,7 @@ Outputs:
     Value: !GetAtt EksClusterRoles.Outputs.AwsLoadBalancerControllerRole
     Export:
       Name: LoadBalancerControllerRole
-  ElasticFileSystemIAMRole:
+  ElasticFileSystemIAMRoleArn:
     Description: ElasticFileSystemIAMRole
     Value: !GetAtt EksClusterRoles.Outputs.ElasticFileSystemIAMRole
     Export:

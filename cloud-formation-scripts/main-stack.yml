@@ -118,7 +118,7 @@ Outputs:
     Value: !GetAtt EKSStack.Outputs.EFSFileSystemId
     Export:
       Name: FileSystemId
-  ElasticFileSystemIAMRoleArn:
+  EFSIAMRoleArn:
     Condition: IsEKSStackNeeded
     Description: ElasticFileSystemIAMRoleArn
     Value: !GetAtt EKSStack.Outputs.ElasticFileSystemIAMRoleArn
