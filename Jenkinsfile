@@ -74,39 +74,39 @@ pipeline {
             }
         }
 
-        // stage('Upload Cloud Formation templates to S3 Bucket') {
-        //     steps {
-        //         container('awscli') {
-        //             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-        //                 script {
-        //                     gv.uploadFileToS3Bucket('network-template.yml')
-        //                     gv.uploadFileToS3Bucket('eks-cluster-roles.yml')
-        //                     gv.uploadFileToS3Bucket('ec2-template.yml')
-        //                     gv.uploadFileToS3Bucket('eks.yml')
-        //                     gv.uploadFileToS3Bucket('web-service-dependencies.yml')
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Upload Cloud Formation templates to S3 Bucket') {
+            steps {
+                container('awscli') {
+                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        script {
+                            gv.uploadFileToS3Bucket('network-template.yml')
+                            gv.uploadFileToS3Bucket('eks-cluster-roles.yml')
+                            gv.uploadFileToS3Bucket('ec2-template.yml')
+                            gv.uploadFileToS3Bucket('eks.yml')
+                            gv.uploadFileToS3Bucket('web-service-dependencies.yml')
+                        }
+                    }
+                }
+            }
+        }
 
-        // stage('Deploy Cloud Formation Stack') {
-        //     steps {
-        //         container('awscli') {
-        //             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-        //                 script {
-        //                     sh """aws cloudformation deploy \
-        //                     --template-file ./cloud-formation-scripts/main-stack.yml \
-        //                     --stack-name $params.STACK_NAME \
-        //                     --region $params.AWS_REGION \
-        //                     --capabilities CAPABILITY_NAMED_IAM \
-        //                     --parameter-overrides StackName=$params.STACK_NAME S3BucketName=$S3_BUCKET_NAME VpcName=$VPC_NAME ClusterName=$EKS_CLUSTER_NAME CreateNetworkStack=$CREATE_NETWORK_INFRASTRUCTURE CreateEKSStack=$CREATE_EKS_INFRASTRUCTURE CreateEC2Stack=$CREATE_EC2_INFRASTRUCTURE
-        //                     """
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Deploy Cloud Formation Stack') {
+            steps {
+                container('awscli') {
+                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        script {
+                            sh """aws cloudformation deploy \
+                            --template-file ./cloud-formation-scripts/main-stack.yml \
+                            --stack-name $params.STACK_NAME \
+                            --region $params.AWS_REGION \
+                            --capabilities CAPABILITY_NAMED_IAM \
+                            --parameter-overrides StackName=$params.STACK_NAME S3BucketName=$S3_BUCKET_NAME VpcName=$VPC_NAME ClusterName=$EKS_CLUSTER_NAME CreateNetworkStack=$CREATE_NETWORK_INFRASTRUCTURE CreateEKSStack=$CREATE_EKS_INFRASTRUCTURE CreateEC2Stack=$CREATE_EC2_INFRASTRUCTURE
+                            """
+                        }
+                    }
+                }
+            }
+        }
 
         stage('Install AWS EKS dependencies') {
             when {
