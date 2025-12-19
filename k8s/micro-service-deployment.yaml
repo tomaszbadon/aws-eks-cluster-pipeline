@@ -8,6 +8,19 @@ metadata:
     eks.amazonaws.com/role-arn: {{S3_BUCKET_ACCESS_ROLE_ARN}}
 
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: micro-service-pvc
+  namespace: micro-service
+spec:
+  # storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
 
 apiVersion: apps/v1
 kind: Deployment
@@ -27,9 +40,16 @@ spec:
         app: micro-service
     spec:
       serviceAccountName: micro-service-sa
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: micro-service-pvc
       containers:
       - name: micro-service
         image: amazon/aws-cli
         command: ['sleep', '10000']
         ports:
         - containerPort: 8080
+        volumeMounts:
+          - mountPath: "/hello-data"
+            name: storage
