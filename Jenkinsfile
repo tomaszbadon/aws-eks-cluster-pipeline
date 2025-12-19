@@ -157,6 +157,7 @@ pipeline {
                         }
                     }
                 }
+
                 stage('Install Ingress Controller') {
                     when {
                         expression {
@@ -182,6 +183,18 @@ pipeline {
                                     gv.fetchEfsCsiRoleArn(params.STACK_NAME)
                                     gv.replaceToken('./k8s/efs-service-account.yml', '{{AWS_EFS_CSI_ROLE_ARN}}', env.AWS_EFS_CSI_ROLE_ARN)
                                     sh 'kubectl apply -f ./k8s/efs-service-account.yml'
+                                }
+                            }
+                        }
+                    }
+                }
+
+                stage('Check AWS EFS CSI Driver') {
+                    steps {
+                        container('awscli') {
+                            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                                script {
+                                    gv.awsEfsCsiDriverExists()
                                 }
                             }
                         }

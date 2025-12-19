@@ -25,7 +25,7 @@ def awsLoadBalancerControllerExists() {
     env.AWS_LOAD_BALANCER_CONTROLLER_EXISTS = status == 0 ? 'true' : 'false'
 }
 
-def awsEfsCsiDriver() {
+def awsEfsCsiDriverExists() {
     def status = sh(script: 'helm status -n kube-system aws-efs-csi-driver', returnStatus: true)
     env.AWS_EFS_CSI_DRIVER_EXISTS = status == 0 ? 'true' : 'false'
 }
