@@ -108,7 +108,7 @@ pipeline {
             }
         }
 
-        stage('Install AwsLoadBalancerController') {
+        stage('Install AWS EKS dependencies') {
             when {
                 expression {
                     params.CREATE_EKS_INFRASTRUCTURE == true
@@ -168,6 +168,20 @@ pipeline {
                             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                                 script {
                                     gv.installAwsLoadBalancerController()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                stage('Deploy AWS EFS Service Account') {
+                    steps {
+                        container('awscli') {
+                            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                                script {
+                                    gv.fetchEfsCsiRoleArn(params.STACK_NAME)
+                                    gv.replaceToken('./k8s/efs-service-account.yml', '{{AWS_EFS_CSI_ROLE_ARN}}', env.AWS_EFS_CSI_ROLE_ARN)
+                                    sh 'kubectl apply -f ./k8s/efs-service-account.yml'
                                 }
                             }
                         }

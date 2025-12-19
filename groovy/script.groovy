@@ -42,6 +42,16 @@ def fetchVpcIdAndLoadBalancerControllerRole(stackName) {
     env.LOAD_BALANCER_ROLE = loadBalancerControllerRole
 }
 
+def fetchEfsCsiRoleArn(stackName) {
+    def efsCsiRoleArn = sh(script: """aws cloudformation describe-stacks \
+        --stack-name $stackName \
+        --query 'Stacks[0].Outputs[?OutputKey==`EFSIAMRoleArn`].OutputValue' \
+        --output text""", returnStdout: true).trim()
+    echo "efsCsiRoleArn: ${efsCsiRoleArn}"
+
+    env.AWS_EFS_CSI_ROLE_ARN = efsCsiRoleArn
+}
+
 def deployAwsLoadBalancerServiceAccount() {
     def fileContent = readFile('./k8s/aws-load-balancer-controller-service-account.yml')
     fileContent = fileContent.replace('{{ROLE_ARN}}', env.LOAD_BALANCER_ROLE)
