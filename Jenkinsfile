@@ -228,10 +228,10 @@ pipeline {
                                     sh 'kubectl apply -f ./k8s/default-storage-class.yml.yml'
                                 }
                             }
-                }
+                        }
                     
-
-            }
+                    }
+                }
         }
 
         stage('Deploy application to EKS Cluster') {
