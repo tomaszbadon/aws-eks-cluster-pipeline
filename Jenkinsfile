@@ -175,115 +175,115 @@ pipeline {
                     }
                 }
 
-                stage('Deploy AWS EFS Service Account') {
-                    steps {
-                        container('awscli') {
-                            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                                script {
-                                    gv.fetchEfsCsiRoleArn(params.STACK_NAME)
-                                    gv.replaceToken('./k8s/efs-service-account.yml', '{{AWS_EFS_CSI_ROLE_ARN}}', env.AWS_EFS_CSI_ROLE_ARN)
-                                    sh 'kubectl apply -f ./k8s/efs-service-account.yml'
-                                }
-                            }
-                        }
-                    }
-                }
+                // stage('Deploy AWS EFS Service Account') {
+                //     steps {
+                //         container('awscli') {
+                //             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                //                 script {
+                //                     gv.fetchEfsCsiRoleArn(params.STACK_NAME)
+                //                     gv.replaceToken('./k8s/efs-service-account.yml', '{{AWS_EFS_CSI_ROLE_ARN}}', env.AWS_EFS_CSI_ROLE_ARN)
+                //                     sh 'kubectl apply -f ./k8s/efs-service-account.yml'
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }
 
-                stage('Check AWS EFS CSI Driver') {
-                    steps {
-                        container('awscli') {
-                            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                                script {
-                                    gv.awsEfsCsiDriverExists()
-                                }
-                            }
-                        }
-                    }
-                }
+                // stage('Check AWS EFS CSI Driver') {
+                //     steps {
+                //         container('awscli') {
+                //             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                //                 script {
+                //                     gv.awsEfsCsiDriverExists()
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }
 
-                stage('Instll AWS EFS CSI Driver') {
-                    when {
-                        expression {
-                            env.AWS_EFS_CSI_DRIVER_EXISTS == 'false'
-                        }
-                    }
-                    steps {
-                        container('awscli') {
-                            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                                script {
-                                    gv.installAwsEfsCsiDriver()
-                                }
-                            }
-                        }
-                    }
-                }
+                // stage('Instll AWS EFS CSI Driver') {
+                //     when {
+                //         expression {
+                //             env.AWS_EFS_CSI_DRIVER_EXISTS == 'false'
+                //         }
+                //     }
+                //     steps {
+                //         container('awscli') {
+                //             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                //                 script {
+                //                     gv.installAwsEfsCsiDriver()
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }
 
-                stage('Apply Storage Class') {
-                    steps {
-                        container('awscli') {
-                            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                                script {
-                                    gv.fetchEFSFileSystemId(params.STACK_NAME)
-                                    gv.replaceToken('./k8s/default-storage-class.yml', '{{EFS_FILE_SYSTEM_ID}}', env.EFS_FILE_SYSTEM_ID)
-                                    sh 'kubectl apply -f ./k8s/default-storage-class.yml'
-                                }
-                            }
-                        }
+                // stage('Apply Storage Class') {
+                //     steps {
+                //         container('awscli') {
+                //             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                //                 script {
+                //                     gv.fetchEFSFileSystemId(params.STACK_NAME)
+                //                     gv.replaceToken('./k8s/default-storage-class.yml', '{{EFS_FILE_SYSTEM_ID}}', env.EFS_FILE_SYSTEM_ID)
+                //                     sh 'kubectl apply -f ./k8s/default-storage-class.yml'
+                //                 }
+                //             }
+                //         }
                     
-                    }
-                }
+                //     }
+                // }
             }
         }
 
-        stage('Deploy application to EKS Cluster') {
-            when {
-                expression {
-                    params.CREATE_EKS_INFRASTRUCTURE == true
-                }
-            }
-            steps{
-                container('awscli') {
-                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        script {
-                                    gv.fetchS3BucketAccessRoleArn(params.STACK_NAME);
-                                    gv.replaceToken('./k8s/micro-service-deployment.yaml', '{{S3_BUCKET_ACCESS_ROLE_ARN}}', env.S3_BUCKET_ACCESS_ROLE);
-                                    sh 'kubectl apply -f ./k8s/ns.yaml'
-                                    sh 'sleep 10'
-                                    sh 'kubectl apply -f ./k8s/micro-service-deployment.yaml'
-                                    sh 'sleep 10'
-                                    sh 'kubectl apply -f ./k8s/micro-service-service.yaml'
-                                    sh 'sleep 10'
-                                    sh 'kubectl apply -f ./k8s/ingress.yaml'
-                                    sh 'sleep 10'
-                        }
-                    }
-                }
-            }
-        }
+        // stage('Deploy application to EKS Cluster') {
+        //     when {
+        //         expression {
+        //             params.CREATE_EKS_INFRASTRUCTURE == true
+        //         }
+        //     }
+        //     steps{
+        //         container('awscli') {
+        //             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+        //                 script {
+        //                             gv.fetchS3BucketAccessRoleArn(params.STACK_NAME);
+        //                             gv.replaceToken('./k8s/micro-service-deployment.yaml', '{{S3_BUCKET_ACCESS_ROLE_ARN}}', env.S3_BUCKET_ACCESS_ROLE);
+        //                             sh 'kubectl apply -f ./k8s/ns.yaml'
+        //                             sh 'sleep 10'
+        //                             sh 'kubectl apply -f ./k8s/micro-service-deployment.yaml'
+        //                             sh 'sleep 10'
+        //                             sh 'kubectl apply -f ./k8s/micro-service-service.yaml'
+        //                             sh 'sleep 10'
+        //                             sh 'kubectl apply -f ./k8s/ingress.yaml'
+        //                             sh 'sleep 10'
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Deploy Hosted Zone') {
-            when {
-                expression {
-                    params.CREATE_EKS_INFRASTRUCTURE == true
-                }
-            }
-            steps {
-                container('awscli') {
-                    withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        script {
-                            gv.fetchDNSNameAndHostedZoneId();
-                            sh """
-                            aws cloudformation deploy \
-                                --template-file ./cloud-formation-scripts/micro-service-route53.yaml \
-                                --stack-name ${params.STACK_NAME}-route53 \
-                                --region $params.AWS_REGION \
-                                --parameter-overrides DNSName=$DNS_NAME HostedZoneId=$CANONICAL_HOSTED_ZONE_ID
-                            """
-                        }
-                    }
-                }
-            }
-        }
+        // stage('Deploy Hosted Zone') {
+        //     when {
+        //         expression {
+        //             params.CREATE_EKS_INFRASTRUCTURE == true
+        //         }
+        //     }
+        //     steps {
+        //         container('awscli') {
+        //             withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+        //                 script {
+        //                     gv.fetchDNSNameAndHostedZoneId();
+        //                     sh """
+        //                     aws cloudformation deploy \
+        //                         --template-file ./cloud-formation-scripts/micro-service-route53.yaml \
+        //                         --stack-name ${params.STACK_NAME}-route53 \
+        //                         --region $params.AWS_REGION \
+        //                         --parameter-overrides DNSName=$DNS_NAME HostedZoneId=$CANONICAL_HOSTED_ZONE_ID
+        //                     """
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
     }
 }
