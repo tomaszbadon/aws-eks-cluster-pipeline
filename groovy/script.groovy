@@ -57,6 +57,16 @@ def fetchEfsCsiRoleArn(stackName) {
     env.AWS_EFS_CSI_ROLE_ARN = efsCsiRoleArn
 }
 
+def fetchEFSFileSystemId(stackName) {
+    def efsFileSystemId = sh(script: """aws cloudformation describe-stacks \
+        --stack-name $stackName \
+        --query 'Stacks[0].Outputs[?OutputKey==`EFSFileSystemId`].OutputValue' \
+        --output text""", returnStdout: true).trim()
+    echo "efsFileSystemId: ${efsFileSystemId}"
+
+    env.EFS_FILE_SYSTEM_ID = efsFileSystemId
+}
+
 def deployAwsLoadBalancerServiceAccount() {
     def fileContent = readFile('./k8s/aws-load-balancer-controller-service-account.yml')
     fileContent = fileContent.replace('{{ROLE_ARN}}', env.LOAD_BALANCER_ROLE)
