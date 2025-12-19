@@ -225,7 +225,7 @@ pipeline {
                                 script {
                                     gv.fetchEFSFileSystemId(params.STACK_NAME)
                                     gv.replaceToken('./k8s/default-storage-class.yml', '{{EFS_FILE_SYSTEM_ID}}', env.EFS_FILE_SYSTEM_ID)
-                                    sh 'kubectl apply -f ./k8s/default-storage-class.yml.yml'
+                                    sh 'kubectl apply -f ./k8s/default-storage-class.yml'
                                 }
                             }
                         }
