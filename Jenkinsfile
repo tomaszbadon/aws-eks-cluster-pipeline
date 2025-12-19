@@ -232,7 +232,7 @@ pipeline {
                     
                     }
                 }
-        }
+        
 
         stage('Deploy application to EKS Cluster') {
             when {
