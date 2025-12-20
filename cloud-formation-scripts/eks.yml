@@ -134,7 +134,7 @@ Resources:
       FileSystemId: !Ref EFSFileSystem
       SubnetId: !Ref PrivateSubnetX
       SecurityGroups:
-        - !Ref DefaultSecurityGroup
+        - !GetAtt EKSCluster.ClusterSecurityGroupId
     
   MountTargetY:
     DependsOn:
@@ -144,7 +144,7 @@ Resources:
       FileSystemId: !Ref EFSFileSystem
       SubnetId: !Ref PrivateSubnetY
       SecurityGroups:
-        - !Ref DefaultSecurityGroup
+        - !GetAtt EKSCluster.ClusterSecurityGroupId
 
   MountTargetZ:
     DependsOn:
@@ -154,7 +154,7 @@ Resources:
       FileSystemId: !Ref EFSFileSystem
       SubnetId: !Ref PrivateSubnetZ
       SecurityGroups:
-        - !Ref DefaultSecurityGroup
+        - !GetAtt EKSCluster.ClusterSecurityGroupId
 
 Outputs: 
   LoadBalancerControllerRole:
