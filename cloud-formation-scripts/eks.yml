@@ -58,6 +58,7 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
         - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/AmazonElasticFileSystemFullAccess
 
   EKSCluster:
     Type: AWS::EKS::Cluster
@@ -115,15 +116,65 @@ Resources:
       TimeoutInMinutes: 10
       TemplateURL: https://bucket-with-stacks.s3.eu-central-1.amazonaws.com/eks-cluster-roles.yml
 
+  EFSFileSystem:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      PerformanceMode: generalPurpose
+      Encrypted: true
+      ThroughputMode: bursting
+      FileSystemTags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-FileSystem"
+
+  MountTargetX:
+    DependsOn:
+      - EFSFileSystem
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !Ref PrivateSubnetX
+      SecurityGroups:
+        - !GetAtt EKSCluster.ClusterSecurityGroupId
+    
+  MountTargetY:
+    DependsOn:
+      - EFSFileSystem
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !Ref PrivateSubnetY
+      SecurityGroups:
+        - !GetAtt EKSCluster.ClusterSecurityGroupId
+
+  MountTargetZ:
+    DependsOn:
+      - EFSFileSystem
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !Ref PrivateSubnetZ
+      SecurityGroups:
+        - !GetAtt EKSCluster.ClusterSecurityGroupId
+
 Outputs: 
   LoadBalancerControllerRole:
     Description: AwsLoadBalancerControllerRole
     Value: !GetAtt EksClusterRoles.Outputs.AwsLoadBalancerControllerRole
     Export:
       Name: LoadBalancerControllerRole
+  ElasticFileSystemIAMRoleArn:
+    Description: ElasticFileSystemIAMRole
+    Value: !GetAtt EksClusterRoles.Outputs.ElasticFileSystemIAMRole
+    Export:
+      Name: ElasticFileSystemIAMRoleArn
   EKSClusterEndpoint:
     Description: EKS Cluster Endpoint
     Value: !GetAtt EKSCluster.Endpoint
     Export:  
       Name: EKSClusterEndpoint
+  EFSFileSystemId:
+    Description: EFS File System ID
+    Value: !Ref EFSFileSystem
+    Export:
+      Name: EFSFileSystemId
   

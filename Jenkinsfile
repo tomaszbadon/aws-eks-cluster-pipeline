@@ -22,7 +22,7 @@ pipeline {
     }
 
     parameters {
-        string(name: 'STACK_NAME', defaultValue: 'eks-application-cluster', description: 'Cloud Formation Stack Name')
+        string(name: 'STACK_NAME', defaultValue: 'eks-application-cluster-2', description: 'Cloud Formation Stack Name')
         booleanParam(name: 'CREATE_NETWORK_INFRASTRUCTURE', defaultValue: true, description: 'Create Network Infrastructure')
         booleanParam(name: 'CREATE_EC2_INFRASTRUCTURE', defaultValue: false, description: 'Create EC2 Infrastructure and Web Server')
         booleanParam(name: 'CREATE_EKS_INFRASTRUCTURE', defaultValue: true, description: 'Create EKS Infrastructure')
@@ -108,7 +108,7 @@ pipeline {
             }
         }
 
-        stage('Install AwsLoadBalancerController') {
+        stage('Install AWS EKS dependencies') {
             when {
                 expression {
                     params.CREATE_EKS_INFRASTRUCTURE == true
@@ -157,6 +157,7 @@ pipeline {
                         }
                     }
                 }
+
                 stage('Install Ingress Controller') {
                     when {
                         expression {
@@ -174,6 +175,63 @@ pipeline {
                     }
                 }
 
+                stage('Deploy AWS EFS Service Account') {
+                    steps {
+                        container('awscli') {
+                            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                                script {
+                                    gv.fetchEfsCsiRoleArn(params.STACK_NAME)
+                                    gv.replaceToken('./k8s/efs-service-account.yml', '{{AWS_EFS_CSI_ROLE_ARN}}', env.AWS_EFS_CSI_ROLE_ARN)
+                                    sh 'kubectl apply -f ./k8s/efs-service-account.yml'
+                                }
+                            }
+                        }
+                    }
+                }
+
+                stage('Check AWS EFS CSI Driver') {
+                    steps {
+                        container('awscli') {
+                            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                                script {
+                                    gv.awsEfsCsiDriverExists()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                stage('Instll AWS EFS CSI Driver') {
+                    when {
+                        expression {
+                            env.AWS_EFS_CSI_DRIVER_EXISTS == 'false'
+                        }
+                    }
+                    steps {
+                        container('awscli') {
+                            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                                script {
+                                    gv.installAwsEfsCsiDriver()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                stage('Apply Storage Class') {
+                    steps {
+                        container('awscli') {
+                            withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                                script {
+                                    gv.fetchEFSFileSystemId(params.STACK_NAME)
+                                    gv.replaceToken('./k8s/default-storage-class.yml', '{{EFS_FILE_SYSTEM_ID}}', env.EFS_FILE_SYSTEM_ID)
+                                    sh 'kubectl apply -f ./k8s/default-storage-class.yml'
+                                }
+                            }
+                        }
+                    
+                    }
+                }
             }
         }
 

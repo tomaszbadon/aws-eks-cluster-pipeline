@@ -25,6 +25,11 @@ def awsLoadBalancerControllerExists() {
     env.AWS_LOAD_BALANCER_CONTROLLER_EXISTS = status == 0 ? 'true' : 'false'
 }
 
+def awsEfsCsiDriverExists() {
+    def status = sh(script: 'helm status -n kube-system aws-efs-csi-driver', returnStatus: true)
+    env.AWS_EFS_CSI_DRIVER_EXISTS = status == 0 ? 'true' : 'false'
+}
+
 def fetchVpcIdAndLoadBalancerControllerRole(stackName) {
     def vpcId = sh(script: """aws cloudformation describe-stacks \
         --stack-name $stackName \
@@ -40,6 +45,26 @@ def fetchVpcIdAndLoadBalancerControllerRole(stackName) {
 
     env.VPC_ID = vpcId
     env.LOAD_BALANCER_ROLE = loadBalancerControllerRole
+}
+
+def fetchEfsCsiRoleArn(stackName) {
+    def efsCsiRoleArn = sh(script: """aws cloudformation describe-stacks \
+        --stack-name $stackName \
+        --query 'Stacks[0].Outputs[?OutputKey==`EFSIAMRoleArn`].OutputValue' \
+        --output text""", returnStdout: true).trim()
+    echo "efsCsiRoleArn: ${efsCsiRoleArn}"
+
+    env.AWS_EFS_CSI_ROLE_ARN = efsCsiRoleArn
+}
+
+def fetchEFSFileSystemId(stackName) {
+    def efsFileSystemId = sh(script: """aws cloudformation describe-stacks \
+        --stack-name $stackName \
+        --query 'Stacks[0].Outputs[?OutputKey==`EFSFileSystemId`].OutputValue' \
+        --output text""", returnStdout: true).trim()
+    echo "efsFileSystemId: ${efsFileSystemId}"
+
+    env.EFS_FILE_SYSTEM_ID = efsFileSystemId
 }
 
 def deployAwsLoadBalancerServiceAccount() {
@@ -60,15 +85,26 @@ def replaceToken(filePath, token, value) {
 
 def installAwsLoadBalancerController() {
     sh(script: 'helm repo add eks https://aws.github.io/eks-charts')
-
     sh(script: 'helm repo update eks')
-
     sh(script: """helm install $AWS_CONTROLLER_RELEASE_NAME eks/aws-load-balancer-controller \
         -n kube-system --set clusterName=$EKS_CLUSTER_NAME \
         --set serviceAccount.create=false \
         --set serviceAccount.name=aws-load-balancer-controller \
         --set region=$params.AWS_REGION \
         --set vpcId=${env.VPC_ID}""")
+}
+
+def installAwsEfsCsiDriver() {
+    sh(script: 'helm repo add aws-efs-csi-driver https://kubernetes-sigs.github.io/aws-efs-csi-driver/')
+
+    sh(script: 'helm repo update aws-efs-csi-driver')
+
+    sh(script: """
+        helm upgrade --install aws-efs-csi-driver \
+        --namespace kube-system aws-efs-csi-driver/aws-efs-csi-driver \
+        --set controller.serviceAccount.create=false \
+        --set controller.serviceAccount.name=efs-csi-controller-sa
+    """);
 }
 
 def fetchS3BucketAccessRoleArn(stackName) {
